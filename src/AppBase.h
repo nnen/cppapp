@@ -11,9 +11,11 @@
 
 
 #include <ostream>
+#include <cstdlib>
 
 #include "Object.h"
 #include "Options.h"
+#include "Output.h"
 
 
 namespace cppapp {
@@ -21,21 +23,24 @@ namespace cppapp {
 
 class AppBase : public Object {
 private:
-	Options options_;
+	Options     options_;
+	Ref<Output> output_;
 	
 	AppBase(const AppBase& other);
 
 protected:
-	Options&            getOptions() { return options_; }
-	Options::Arguments& getArguments() { return options_.args(); }
+	Options&            options() { return options_; }
+	Options::Arguments& args() { return options_.args(); }
+	
+	Ref<Output>         output() { return output_; }
 	
 	virtual void printUsage(std::ostream& out);
-	virtual void setUp() {}
-	virtual int run() { return EXIT_SUCCESS; }
+	virtual void setUp();
+	virtual int run();
 
 public:
 	AppBase();
-	virtual ~AppBase();
+	virtual ~AppBase() {}
 	
 	int run(int argc, char* argv[]);
 };
@@ -46,6 +51,14 @@ int main(int argc, char* argv[])
 {
 	T app;
 	return app.run(argc, argv);
+}
+
+
+#define CPPAPP_BOOTSTRAP \
+int main(int argc, char* argv[]) \
+{ \
+	App app; \
+	return app.run(argc, argv); \
 }
 
 

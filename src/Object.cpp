@@ -17,13 +17,10 @@
 namespace cppapp {
 
 
-Object::RingItem* Object::_ring = NULL;
-
-
 Object::Object()
 {
-	_refCount = 0;
-	_sentinel = SENTINEL;
+	refCount_ = 0;
+	sentinel_ = SENTINEL;
 }
 
 
@@ -31,22 +28,22 @@ Object::~Object()
 {
 	checkHealth();
 	
-	_refCount = 0;
-	_sentinel = DEAD_SENTINEL;
+	refCount_ = 0;
+	sentinel_ = DEAD_SENTINEL;
 }
 
 
 void Object::claim()
 {
 	checkHealth();
-	_refCount++;
+	refCount_++;
 }
 
 
 void Object::checkHealth() const
 {
-	assert(_refCount >= 0);
-	assert(_sentinel == SENTINEL);
+	assert(refCount_ >= 0);
+	assert(sentinel_ == SENTINEL);
 }
 
 
@@ -54,7 +51,7 @@ Object* Object::release(Object* obj)
 {
 	if (obj != NULL) obj->checkHealth();
 	
-	if (--(obj->_refCount) <= 0) {
+	if (--(obj->refCount_) <= 0) {
 		delete obj;
 		return NULL;
 	}

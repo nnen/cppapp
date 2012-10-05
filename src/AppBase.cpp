@@ -15,6 +15,45 @@ namespace cppapp {
 void AppBase::printUsage(std::ostream& out)
 {
 	options_.printUsage(out);
+	out << std::endl;
+}
+
+
+/**
+ *
+ */
+void AppBase::setUp()
+{
+	options().add('o', true, "OUTPUT", "Write output to file OUTPUT.");
+	options().add('h', "Print this help.");
+}
+
+
+/**
+ *
+ */
+int AppBase::run()
+{
+	if ((bool)options().get('h')) {
+		printUsage(std::cout);
+		exit(EXIT_SUCCESS);
+	}
+	
+	Option out = options().get('o');
+	if ((bool)out) {
+		output_ = new FileOutput((string)out);
+	}
+	
+	return EXIT_SUCCESS;
+}
+
+
+/**
+ * Constructor.
+ */
+AppBase::AppBase()
+	: output_(new StandardOutput())
+{
 }
 
 

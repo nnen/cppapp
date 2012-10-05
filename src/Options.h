@@ -33,26 +33,28 @@ struct Option {
 	char        letter;
 	bool        takesArgument;
 	const char* argumentMetavar;
+	const char* description;
 	
 	bool        isSet;
 	string      argument;
 	
 	Option() :
-		letter('?'), takesArgument(false), argumentMetavar(""), isSet(false), argument()
+		letter('?'), takesArgument(false), argumentMetavar(""), description(""), isSet(false), argument()
 	{
 	}
 	
-	Option(char letter, bool takesArgument, const char* metavar) :
-		letter(letter), takesArgument(takesArgument), argumentMetavar(metavar), isSet(false), argument()
+	Option(char letter, bool takesArgument, const char* metavar, const char* description = "") :
+		letter(letter), takesArgument(takesArgument), argumentMetavar(metavar), description(description), isSet(false), argument()
 	{	
 	}
 	
-	Option(char letter, string defaultValue, const char* metavar) :
-		letter(letter), takesArgument(true), argumentMetavar(metavar), isSet(false), argument(defaultValue)
+	Option(char letter, string defaultValue, const char* metavar, const char* description = "") :
+		letter(letter), takesArgument(true), argumentMetavar(metavar), description(description), isSet(false), argument(defaultValue)
 	{
 	}
 	
 	operator bool() const { return isSet; }
+	operator string() const { return argument; }
 	
 	void set(char * arg)
 	{
@@ -98,10 +100,10 @@ public:
 	Options();
 	~Options();
 	
-	void add(char letter, string defaultValue, const char* metavar);
-	void add(char letter, const char * defaultValue, const char* metavar);
-	void add(char letter, bool takesArgument, const char* metavar);
-	void add(char letter);
+	void add(char letter, string defaultValue, const char* metavar, const char* description = "");
+	void add(char letter, const char * defaultValue, const char* metavar, const char* description = "");
+	void add(char letter, bool takesArgument, const char* metavar, const char* description = "");
+	void add(char letter, const char* description = "");
 	
 	void parse(int argc, char *argv[]);
 	

@@ -22,58 +22,53 @@ namespace cppapp {
 #define DEAD_SENTINEL 31415
 
 
+template<class T>
+struct RingItem {
+private:
+	RingItem<T>* previous_;
+	RingItem<T>* next_;
+	
+	RingItem(const RingItem<T>& other);
+	RingItem<T>& operator=(const RingItem<T>& other);
+
+public:
+	RingItem() : previous_(NULL), next_(NULL) {}
+	~RingItem() { remove(); }
+	
+	inline RingItem<T>* previous() { return previous_; }
+	inline RingItem<T>* next()     { return next_; }
+	
+	inline const RingItem<T>* previous() const { return previous_; }
+	inline const RingItem<T>* next() const     { return next_; }
+	
+	void append(RingItem<T>& item)
+	{
+		item.remove();
+		
+		item.previous_ = this;
+		item.next_     = next_;
+		
+		next_->previous_ = &item;
+		next_            = &item;
+	}
+	
+	void remove()
+	{
+		if (previous_ != NULL)
+			previous_->next_ = next_;
+		if (next_ != NULL)
+			next_->previous_ = previous_;
+		
+		previous_ = NULL;
+		next_     = NULL;
+	}
+};
+
+
 class Object {
 private:
-	struct RingItem {
-	public:
-		RingItem* previous;
-		RingItem* next;
-		
-		Object*   obj;
-		
-		RingItem()
-		{
-			previous = NULL;
-			next = NULL;
-			obj = NULL;
-		}
-		
-		~RingItem()
-		{
-			if (previous)
-				previous->next = next;
-			if (next)
-				next->previous = previous;
-			previous = NULL;
-			next = NULL;
-			obj = NULL;
-		}
-		
-		void insert(RingItem** ring)
-		{
-			if (*ring == NULL) {
-				*ring = this;
-				return;
-			}
-			
-			next = (*ring)->next;
-			previous = *ring;
-			if ((*ring)->next)
-				(*ring)->next->previous = this;
-			(*ring)->next = this;
-		}
-		
-		void dispose()
-		{
-			delete obj;
-			obj = NULL;
-		}
-	};
-	
-	static RingItem* _ring;
-
-	int _refCount;
-	int _sentinel;
+	int refCount_;
+	int sentinel_;
 
 public:
 	Object();
@@ -90,36 +85,36 @@ public:
 template<class T>
 class Box : public Object {
 private:
-	T _value;
+	T value_;
 
 public:
-	Box() : _value() {}
-	Box(T value) : _value(value) {}
+	Box() : value_() {}
+	Box(T value) : value_(value) {}
 	virtual ~Box() {}
 
-	const T* operator -> () const { return &_value; }
-	T* operator -> ()             { return &_value; }
+	const T* operator -> () const { return &value_; }
+	T* operator -> ()             { return &value_; }
 
-	const T& operator * () const { return _value; }
-	T& operator * () { return _value; }
+	const T& operator * () const { return value_; }
+	T& operator * () { return value_; }
 };
 
 
 template<class T>
 class HeapBox : public Object {
 private:
-	T * _value;
+	T * value_;
 
 public:
-	HeapBox() : _value(NULL) {}
-	HeapBox(T * value) : _value(value) {}
-	virtual ~HeapBox() { delete _value; _value = NULL; }
+	HeapBox() : value_(NULL) {}
+	HeapBox(T * value) : value_(value) {}
+	virtual ~HeapBox() { delete value_; value_ = NULL; }
 	
-	const T* operator -> () const { return _value; }
-	T* operator -> ()             { return _value; }
+	const T* operator -> () const { return value_; }
+	T* operator -> ()             { return value_; }
 	
-	const T& operator * () const  { return *_value; }
-	T& operator * ()              { return *_value; }
+	const T& operator * () const  { return *value_; }
+	T& operator * ()              { return *value_; }
 };
 
 
@@ -152,36 +147,36 @@ class BRef;
 template<class T>
 class Ref {
 private:
-	T* _ptr;
+	T* ptr_;
 
 	void setPtr(T* value)
 	{
-		if (_ptr == value)
+		if (ptr_ == value)
 			return;
 		
-		if (_ptr != NULL)
-			Object::release(_ptr);
-		_ptr = value;
-		if (_ptr != NULL)
-			_ptr->claim();
+		if (ptr_ != NULL)
+			Object::release(ptr_);
+		ptr_ = value;
+		if (ptr_ != NULL)
+			ptr_->claim();
 	}
 
 public:
 	Ref()
 	{
-		_ptr = NULL;
+		ptr_ = NULL;
 		setPtr(NULL);
 	}
 	
 	Ref(T* ptr)
 	{
-		_ptr = NULL;
+		ptr_ = NULL;
 		setPtr(ptr);
 	}
 	
 	Ref(const Ref<T>& ref)
 	{
-		_ptr = NULL;
+		ptr_ = NULL;
 		setPtr(ref.getPtr());
 	}
 	
@@ -262,13 +257,13 @@ public:
 	}
 	*/
 	
-	bool isNull() const { return _ptr == NULL; }
+	bool isNull() const { return ptr_ == NULL; }
 	bool isNotNull() const { return !isNull(); }
 	
 	T* getPtr() const
 	{
-		if (_ptr != NULL) _ptr->checkHealth();
-		return _ptr;
+		if (ptr_ != NULL) ptr_->checkHealth();
+		return ptr_;
 	}
 
 	template<class U>
@@ -285,32 +280,32 @@ typedef Ref<Object> ObjRef;
 template<class T>
 class BRef {
 private:
-	Ref<Box<T> > _box;
+	Ref<Box<T> > box_;
 
 public:
-	BRef() : _box() {}
-	BRef(T value) : _box(new Box<T>(value)) {}
-	BRef(const BRef<T>& other) : _box(other._box) {}
-	BRef(const Ref<Box<T> >& other) : _box(other) {}
+	BRef() : box_() {}
+	BRef(T value) : box_(new Box<T>(value)) {}
+	BRef(const BRef<T>& other) : box_(other.box_) {}
+	BRef(const Ref<Box<T> >& other) : box_(other) {}
 	~BRef() {}
 	
 	BRef<T>& operator=(const Ref<Object>& reference)
 	{
-		_box = reference.as<Box<T> >();
+		box_ = reference.as<Box<T> >();
 		return *this;
 	}
 	
-	T* operator -> () { return &(**_box); }
-	const T* operator -> () const { return &(**_box); }
+	T* operator -> () { return &(**box_); }
+	const T* operator -> () const { return &(**box_); }
 	
-	T& operator * () { return (**_box); }
-	const T& operator * () const { return (**_box); }
+	T& operator * () { return (**box_); }
+	const T& operator * () const { return (**box_); }
 	
-	operator Ref<Box<T> > () const { return _box; }
-	operator Ref<Object> () const { return _box; }
+	operator Ref<Box<T> > () const { return box_; }
+	operator Ref<Object> () const { return box_; }
 	
-	void         makeNew() { _box = new Box<T>(); }
-	Ref<Box<T> > box() { return _box; }
+	void         makeNew() { box_ = new Box<T>(); }
+	Ref<Box<T> > box() { return box_; }
 };
 
 

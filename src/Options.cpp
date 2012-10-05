@@ -37,27 +37,27 @@ Options::~Options()
 }
 
 
-void Options::add(char option, string defaultValue, const char* metavar)
+void Options::add(char option, string defaultValue, const char* metavar, const char* description)
 {
-	options[option] = Option(option, defaultValue, metavar);
+	options[option] = Option(option, defaultValue, metavar, description);
 }
 
 
-void Options::add(char option, const char * defaultValue, const char* metavar)
+void Options::add(char option, const char * defaultValue, const char* metavar, const char* description)
 {
-	add(option, string(defaultValue), metavar);
+	add(option, string(defaultValue), metavar, description);
 }
 
 
-void Options::add(char option, bool takesArgument, const char* metavar)
+void Options::add(char option, bool takesArgument, const char* metavar, const char* description)
 {
-	options[option] = Option(option, takesArgument, metavar);
+	options[option] = Option(option, takesArgument, metavar, description);
 }
 
 
-void Options::add(char option)
+void Options::add(char option, const char* description)
 {
-	add(option, false, "");
+	add(option, false, "", description);
 }
 
 
@@ -105,10 +105,17 @@ Option& Options::get(int opt)
 
 void Options::printUsage(ostream& output)
 {
-	output << executable;
+	output << "Usage: " << executable;
 	FOR_EACH(options, pair) {
 		output << " ";
 		pair->second.printUsage(output);
+	}
+	output << endl << "Options:" << endl;
+	FOR_EACH(options, pair) {
+		if (pair->second.description == "")
+			continue;
+		output << "   -" << pair->second.letter;
+		output << "  " << pair->second.description << endl;
 	}
 }
 

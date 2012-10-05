@@ -3,7 +3,7 @@
 #
 
 
-BIN_NAME     = libcppapp
+BIN_NAME     = libcppapp.a
 # yes / no
 IS_LIBRARY   = yes
 
