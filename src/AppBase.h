@@ -33,6 +33,7 @@ protected:
 	Options::Arguments& args() { return options_.args(); }
 	
 	Ref<Output>         output() { return output_; }
+	void                setOutput(Ref<Output> output) { output_ = output; }
 	
 	virtual void printUsage(std::ostream& out);
 	virtual void setUp();

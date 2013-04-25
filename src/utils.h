@@ -29,6 +29,10 @@ namespace cppapp {
 	cerr << "WARNING:" << __FILE__ << ":" << __LINE__ << ": " << msg << endl; \
 }
 
+#define PRINT_EXPR(expr) { \
+	cerr << #expr << " = " << (expr) << endl; \
+}
+
 
 #define VAR(name, expr) typeof(expr) name = (expr)
 
