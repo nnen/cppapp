@@ -89,10 +89,14 @@ public:
 private:
 	Options(const Options& other);
 	
-	Map       options;
-	Arguments arguments;
-	string    executable;
-	bool      valid;
+	int          argc;
+	char**       argv;
+	
+	const char* usage;
+	Map         options;
+	Arguments   arguments;
+	string      executable;
+	bool        valid;
 	
 	void error(string message);
 	
@@ -105,11 +109,16 @@ public:
 	void add(char letter, bool takesArgument, const char* metavar, const char* description = "");
 	void add(char letter, const char* description = "");
 	
+	void setUsage(const char* usage) { this->usage = usage; }
+	
 	void parse(int argc, char *argv[]);
 	
 	Option& get(int opt);
 	
 	Arguments& args() { return arguments; } 
+	
+	int getArgc() const { return argc; }
+	char** getArgv() const { return argv; }
 	
 	bool isValid() const { return valid; }
 	
