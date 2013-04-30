@@ -12,6 +12,22 @@
 namespace cppapp {
 
 
+string pathWithoutExtension(const string &path)
+{
+	int dotIndex = path.find_last_of(".");
+	return path.substr(0, dotIndex);
+}
+
+
+string pathWithExtension(const string &path, const string &extension)
+{
+	string result = pathWithoutExtension(path);
+	result += ".";
+	result += extension;
+	return result;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // FILE INPUT
 ///////////////////////////////////////////////////////////////////////////////

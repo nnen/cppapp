@@ -23,6 +23,10 @@ using namespace std;
 namespace cppapp {
 
 
+string pathWithoutExtension(const string &path);
+string pathWithExtension(const string &path, const string &extension);
+
+
 /**
  * Represents an abstract input.
  */
@@ -41,6 +45,14 @@ public:
 	virtual void close() {}
 	
 	inline istream* operator->() { return getStream(); }
+	
+	
+	virtual string getFileNameWithExt(const string &extension)
+	{
+		string result = "output.";
+		result += extension;
+		return result;
+	}
 };
 
 
@@ -80,6 +92,12 @@ public:
 	
 	bool hasExtension(string extension);
 	static bool hasExtension(string fileName, string extension);
+	
+	
+	virtual string getFileNameWithExt(const string &extension)
+	{
+		return pathWithExtension(fileName_, extension);
+	}
 };
 
 
