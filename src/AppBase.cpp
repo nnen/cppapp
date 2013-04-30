@@ -24,7 +24,7 @@ void AppBase::printUsage(std::ostream& out)
  */
 void AppBase::setUp()
 {
-	options().add('o', true, "OUTPUT", "Write output to file OUTPUT.");
+	options().add('o', true, "OUTPUT_FILE", "Write output to file OUTPUT_FILE.");
 	options().add('h', "Print this help.");
 }
 
@@ -32,7 +32,7 @@ void AppBase::setUp()
 /**
  *
  */
-int AppBase::run()
+int AppBase::onRun()
 {
 	if ((bool)options().get('h')) {
 		printUsage(std::cout);
@@ -67,7 +67,7 @@ int AppBase::run(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 	
-	return run();
+	return onRun();
 }
 
 

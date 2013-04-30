@@ -37,7 +37,7 @@ protected:
 	
 	virtual void printUsage(std::ostream& out);
 	virtual void setUp();
-	virtual int run();
+	virtual int onRun();
 
 public:
 	AppBase();
