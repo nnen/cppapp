@@ -6,6 +6,9 @@
  * \brief Implementation file for the Options class.
  */
 
+
+#include <cstring>
+
 #include "Options.h"
 
 
@@ -23,8 +26,8 @@ void Options::error(string message)
 
 
 Options::Options()
+	: usage(""), valid(true)
 {
-	valid = true;
 }
 
 
@@ -72,6 +75,9 @@ void Options::add(char option, const char* description)
 
 void Options::parse(int argc, char *argv[])
 {
+	this->argc = argc;
+	this->argv = argv;
+	
 	stringstream s;
 	s << ":";
 	FOR_EACH(options, opt) {
@@ -119,9 +125,10 @@ void Options::printUsage(ostream& output)
 		output << " ";
 		pair->second.printUsage(output);
 	}
+	output << " " << usage;
 	output << endl << "Options:" << endl;
 	FOR_EACH(options, pair) {
-		if (pair->second.description == "")
+		if (strcmp(pair->second.description, "") == 0)
 			continue;
 		output << "   -" << pair->second.letter;
 		output << "  " << pair->second.description << endl;
