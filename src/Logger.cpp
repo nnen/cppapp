@@ -25,6 +25,8 @@ STATIC_CTOR_IMPL(Logger)
 	levels_.push_back(Logger(LOG_LVL_ERROR));
 	levels_.push_back(Logger(LOG_LVL_WARNING));
 	levels_.push_back(Logger(LOG_LVL_DEBUG));
+
+	defaultConfig();
 }
 
 
@@ -61,7 +63,18 @@ Logger& Logger::getLogger(LogLevel level)
 }
 
 
-void Logger::addTarget(LogLevel level, string fileName)
+void Logger::addOutput(LogLevel level, Ref<Output> output)
+{
+	if (level >= (int)levels_.size())
+		level = (LogLevel)(levels_.size() - 1);
+	
+	for (int l = LOG_LVL_ERROR; l <= level; l++) {
+		levels_[l].addOutput(output);
+	}
+}
+
+
+void Logger::addOutput(LogLevel level, string fileName)
 {
 	Ref<Output> output;
 	
@@ -71,12 +84,50 @@ void Logger::addTarget(LogLevel level, string fileName)
 		output = new FileOutput(fileName, ios_base::out | ios_base::app);
 	}
 	
-	if (level >= (int)levels_.size())
-		level = (LogLevel)(levels_.size() - 1);
-	
-	for (int l = LOG_LVL_ERROR; l <= level; l++) {
-		levels_[l].addOutput(output);
+	addOutput(level, output);
+}
+
+
+/**
+ *
+ */
+void Logger::clearConfig()
+{
+	FOR_EACH(levels_, lvl) {
+		lvl->clearOutputs();
 	}
+}
+
+
+/**
+ *
+ */
+void Logger::defaultConfig(string fileName)
+{
+	clearConfig();
+	
+#ifdef NDEBUG
+	addOutput(LOG_LVL_ERROR, "-");
+	addOutput(LOG_LVL_ERROR, fileName);
+#else
+	addOutput(LOG_LVL_DEBUG, "-");
+	addOutput(LOG_LVL_DEBUG, fileName);
+#endif
+}
+
+
+/**
+ *
+ */
+void Logger::defaultConfig()
+{
+	clearConfig();
+	
+#ifdef NDEBUG
+	addOutput(LOG_LVL_ERROR, "-");
+#else
+	addOutput(LOG_LVL_DEBUG, "-");
+#endif
 }
 
 

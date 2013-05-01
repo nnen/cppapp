@@ -15,16 +15,26 @@
 #	define LOG_WARNING(message__)
 #	define LOG_DEBUG(message__)
 #	define LOG_ASSERTION(expr)
+#	define LOG_EXPR(expr)
 #else // LOG_DISABLE
-#	define LOG_ERROR(message__)   { Logger::error() << Logger::Entry(__FILE__, __LINE__) << message__ << flush << endl; }
-#	define LOG_WARNING(message__) { Logger::warning() << Logger::Entry(__FILE__, __LINE__) << message__ << flush << endl; }
+#	define LOG_ERROR(message__) { \\
+		Logger::error() << Logger::Entry(__FILE__, __LINE__) << \\
+		message__ << flush << endl; }
+#	define LOG_WARNING(message__) { \\
+		Logger::warning() << Logger::Entry(__FILE__, __LINE__) << \\
+		message__ << flush << endl; }
 #	ifndef NDEBUG
-#		define LOG_DEBUG(message__)   { Logger::debug() << Logger::Entry(__FILE__, __LINE__) << message__ << flush << endl; }
-#		define LOG_ASSERTION(expr)    { if (!(expr)) LOG_ERROR("Assertion \"" #expr "\" failed!"); assert(expr); }
+#		define LOG_DEBUG(message__) { \\
+			Logger::debug() << Logger::Entry(__FILE__, __LINE__) << \\
+			message__ << flush << endl; }
+#		define LOG_ASSERTION(expr) { \\
+			if (!(expr)) LOG_ERROR("Assertion \"" #expr "\" failed!"); \\
+			assert(expr); }
 #	else
 #		define LOG_DEBUG(message__)
 #		define LOG_ASSERTION(expr)
 #	endif
+#	define LOG_EXPR(expr) LOG_DEBUG(#expr " = " << (expr))
 #endif // LOG_DISABLE
 
 
@@ -98,6 +108,7 @@ public:
 	}
 	
 	Logger& addOutput(Ref<Output> output) { outputs_.push_back(output); return *this; }
+	Logger& clearOutputs() { outputs_.clear(); }
 	
 	static const char* logLevelToString(LogLevel level);
 	
@@ -107,7 +118,14 @@ public:
 	static Logger& warning() { return getLogger(LOG_LVL_WARNING); }
 	static Logger& debug()   { return getLogger(LOG_LVL_DEBUG); }
 	
-	static void addTarget(LogLevel level, string fileName);
+	static void addOutput(LogLevel level, Ref<Output> output);
+	static void addOutput(LogLevel level, string fileName);
+	static void clearConfig();
+	
+	static void defaultConfig(string fileName);
+	static void defaultConfig();
+	
+	static vector<string> getBacktrace();
 	
 	
 	struct Entry {
@@ -124,9 +142,6 @@ public:
 			lineNumber(lineNumber)
 		{}
 	};
-
-
-	static vector<string> getBacktrace();
 };
 
 
