@@ -37,19 +37,28 @@ Options::~Options()
 }
 
 
-void Options::add(char option, string defaultValue, const char* metavar, const char* description)
+void Options::add(char option,
+			   string defaultValue,
+			   const char* metavar,
+			   const char* description)
 {
 	options[option] = Option(option, defaultValue, metavar, description);
 }
 
 
-void Options::add(char option, const char * defaultValue, const char* metavar, const char* description)
+void Options::add(char option,
+			   const char * defaultValue,
+			   const char* metavar,
+			   const char* description)
 {
 	add(option, string(defaultValue), metavar, description);
 }
 
 
-void Options::add(char option, bool takesArgument, const char* metavar, const char* description)
+void Options::add(char option,
+			   bool takesArgument,
+			   const char* metavar,
+			   const char* description)
 {
 	options[option] = Option(option, takesArgument, metavar, description);
 }
