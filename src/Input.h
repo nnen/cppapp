@@ -23,6 +23,7 @@ using namespace std;
 namespace cppapp {
 
 
+string pathBasename(const string &path);
 string pathWithoutExtension(const string &path);
 string pathWithExtension(const string &path, const string &extension);
 

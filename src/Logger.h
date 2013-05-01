@@ -13,22 +13,26 @@
 #ifdef LOG_DISABLE
 #	define LOG_ERROR(message__)
 #	define LOG_WARNING(message__)
+#	define LOG_INFO(message__)
 #	define LOG_DEBUG(message__)
 #	define LOG_ASSERTION(expr)
 #	define LOG_EXPR(expr)
 #else // LOG_DISABLE
-#	define LOG_ERROR(message__) { \\
-		Logger::error() << Logger::Entry(__FILE__, __LINE__) << \\
+#	define LOG_ERROR(message__) { \
+		Logger::error() << Logger::Entry(__FILE__, __LINE__) << \
 		message__ << flush << endl; }
-#	define LOG_WARNING(message__) { \\
-		Logger::warning() << Logger::Entry(__FILE__, __LINE__) << \\
+#	define LOG_WARNING(message__) { \
+		Logger::warning() << Logger::Entry(__FILE__, __LINE__) << \
+		message__ << flush << endl; }
+#	define LOG_INFO(message__) { \
+		Logger::info() << Logger::Entry(__FILE__, __LINE__) << \
 		message__ << flush << endl; }
 #	ifndef NDEBUG
-#		define LOG_DEBUG(message__) { \\
-			Logger::debug() << Logger::Entry(__FILE__, __LINE__) << \\
+#		define LOG_DEBUG(message__) { \
+			Logger::debug() << Logger::Entry(__FILE__, __LINE__) << \
 			message__ << flush << endl; }
-#		define LOG_ASSERTION(expr) { \\
-			if (!(expr)) LOG_ERROR("Assertion \"" #expr "\" failed!"); \\
+#		define LOG_ASSERTION(expr) { \
+			if (!(expr)) LOG_ERROR("Assertion \"" #expr "\" failed!"); \
 			assert(expr); }
 #	else
 #		define LOG_DEBUG(message__)
@@ -57,6 +61,7 @@ enum LogLevel {
 	LOG_LVL_NONE,
 	LOG_LVL_ERROR,
 	LOG_LVL_WARNING,
+	LOG_LVL_INFO,
 	LOG_LVL_DEBUG
 };
 
@@ -108,7 +113,7 @@ public:
 	}
 	
 	Logger& addOutput(Ref<Output> output) { outputs_.push_back(output); return *this; }
-	Logger& clearOutputs() { outputs_.clear(); }
+	Logger& clearOutputs() { outputs_.clear(); return *this; }
 	
 	static const char* logLevelToString(LogLevel level);
 	
@@ -116,6 +121,7 @@ public:
 	
 	static Logger& error()   { return getLogger(LOG_LVL_ERROR); }
 	static Logger& warning() { return getLogger(LOG_LVL_WARNING); }
+	static Logger& info()    { return getLogger(LOG_LVL_INFO); }
 	static Logger& debug()   { return getLogger(LOG_LVL_DEBUG); }
 	
 	static void addOutput(LogLevel level, Ref<Output> output);

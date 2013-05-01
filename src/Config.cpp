@@ -233,6 +233,15 @@ void ConfigParser::readLine()
 
 
 /**
+ * Constructor.
+ */
+ConfigParser::ConfigParser(Ref<Config> config) :
+	config_(config)
+{
+}
+
+
+/**
  *
  */
 void ConfigParser::parse(Ref<Input> input)

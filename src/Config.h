@@ -126,6 +126,7 @@ private:
 	void readLine();
 
 public:
+	ConfigParser(Ref<Config> config);
 	virtual ~ConfigParser() {}
 
 	Ref<Config> getConfig() { return config_; }

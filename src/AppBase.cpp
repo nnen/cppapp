@@ -8,8 +8,23 @@
 
 #include "AppBase.h"
 
+#include <sstream>
+
 
 namespace cppapp {
+
+
+/**
+ *
+ */
+string AppBase::getDefaultConfigFile() const
+{
+	ostringstream s;
+	s << getenv("HOME") <<
+		"/." <<
+		pathBasename(options_.getExecutable());
+	return s.str();
+}
 
 
 void AppBase::printUsage(std::ostream& out)
@@ -51,8 +66,9 @@ int AppBase::onRun()
 /**
  * Constructor.
  */
-AppBase::AppBase()
-	: output_(new StandardOutput())
+AppBase::AppBase() :
+	config_(new Config()),
+	output_(new StandardOutput())
 {
 }
 
@@ -61,11 +77,19 @@ int AppBase::run(int argc, char* argv[])
 {
 	setUp();
 	
+	Logger::defaultConfig();
+	
 	options_.parse(argc, argv);
 	if (!options_.isValid()) {
 		printUsage(std::cerr);
 		return EXIT_FAILURE;
 	}
+	
+	string configFileName = config_->get("config_file",
+								  getDefaultConfigFile())->asString();
+	LOG_EXPR(configFileName);
+	ConfigParser parser(config_);
+	parser.parse(new FileInput(configFileName));
 	
 	return onRun();
 }

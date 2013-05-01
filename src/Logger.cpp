@@ -24,8 +24,9 @@ STATIC_CTOR_IMPL(Logger)
 	levels_.push_back(Logger(LOG_LVL_NONE));
 	levels_.push_back(Logger(LOG_LVL_ERROR));
 	levels_.push_back(Logger(LOG_LVL_WARNING));
+	levels_.push_back(Logger(LOG_LVL_INFO));
 	levels_.push_back(Logger(LOG_LVL_DEBUG));
-
+	
 	defaultConfig();
 }
 
@@ -33,9 +34,16 @@ STATIC_CTOR_IMPL(Logger)
 Logger& Logger::operator << (Logger::Entry entry)
 {
 	(*this)
-		<< "[" << Logger::logLevelToString(level_)
+		<< "["
+		<< LogTime()
 		<< " "
-		<< entry.fileName << ":" << entry.lineNumber
+		<< Logger::logLevelToString(level_);
+	if (level_ >= LOG_LVL_DEBUG) {
+		(*this)
+			<< " "
+			<< entry.fileName << ":" << entry.lineNumber;
+	}
+	(*this)
 		<< "]  ";
 	
 	return *this;
@@ -48,6 +56,7 @@ const char* Logger::logLevelToString(LogLevel level)
 	case LOG_LVL_NONE:    return "NONE";
 	case LOG_LVL_ERROR:   return "ERROR";
 	case LOG_LVL_WARNING: return "WARNING";
+	case LOG_LVL_INFO:    return "INFO";
 	case LOG_LVL_DEBUG:   return "DEBUG";
 	default:              return "UNDEFINED";
 	}
@@ -157,7 +166,7 @@ ostream& operator << (ostream& output, const LogTime& tm)
 {
 	time_t t = time(NULL);
 	char buffer[80];
-	int length = strftime(buffer, 80, "%A %H:%M:%S", localtime(&t));
+	int length = strftime(buffer, 80, "%Y-%m-%d %a %H:%M:%S", localtime(&t));
 	if (length > 0)
 		output << buffer;
 	else

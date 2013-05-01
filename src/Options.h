@@ -141,6 +141,7 @@ public:
 	Option& get(int opt);
 	
 	Arguments& args() { return arguments; } 
+	string     getExecutable() const { return executable; }
 	
 	bool isValid() const { return valid; }
 	

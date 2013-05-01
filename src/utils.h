@@ -214,8 +214,12 @@ struct IntMetrics {
 
 
 #define STATIC_CTOR(className) StaticCtor<className> DUMMY_##className##_staticCtor; void className::staticCtor()
-#define STATIC_CTOR_HEADER(className) StaticCtor<className> DUMMY_##className##_staticCtor; static void staticCtor();
-#define STATIC_CTOR_IMPL(className) void className::staticCtor()
+#define STATIC_CTOR_HEADER(className) \
+	static StaticCtor<className> DUMMY_##className##_staticCtor; \
+	static void staticCtor();
+#define STATIC_CTOR_IMPL(className) \
+	StaticCtor<className> className::DUMMY_##className##_staticCtor; \
+	void className::staticCtor()
 
 
 } // namespace cppapp

@@ -25,9 +25,14 @@ all: $(DEP_FILES)
 build: $(BIN_NAME)
 
 
+docs:
+	doxygen
+
+
 clean:
 	@echo "========= CLEANING ========="
 	rm -f $(OBJECT_FILES) $(BIN_NAME)
+	rm -fR docs
 	@echo
 
 
@@ -54,7 +59,7 @@ endif
 	@echo
 
 
-.PHONY: all build clean rebuild deps clean-deps
+.PHONY: all build clean rebuild deps clean-deps docs
 
 
 %.d: %.cpp

@@ -8,8 +8,24 @@
 
 #include "Input.h"
 
+#include <libgen.h>
+
 
 namespace cppapp {
+
+
+string pathBasename(const string &path)
+{
+	char *p = new char[path.size() + 1];
+	path.copy(p, path.size());
+	p[path.size()] = 0;
+	
+	char *bn = basename(p);
+	string result(bn);
+	delete [] p;
+	
+	return result;
+}
 
 
 string pathWithoutExtension(const string &path)

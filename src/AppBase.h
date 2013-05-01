@@ -14,30 +14,41 @@
 #include <cstdlib>
 
 #include "Object.h"
+#include "Config.h"
 #include "Options.h"
 #include "Output.h"
+#include "Logger.h"
 
 
 namespace cppapp {
 
 
+/**
+ * \brief Base class for unix commnad-line applications.
+ */
 class AppBase : public Object {
 private:
+	Ref<Config> config_;
+	
 	Options     options_;
 	Ref<Output> output_;
 	
 	AppBase(const AppBase& other);
 
 protected:
+	virtual string      getDefaultConfigFile() const;
+	Ref<Config>         config() { return config_; }
+	void                setConfig(Ref<Config> cfg) { config_ = cfg; }
+	
 	Options&            options() { return options_; }
 	Options::Arguments& args() { return options_.args(); }
 	
 	Ref<Output>         output() { return output_; }
 	void                setOutput(Ref<Output> output) { output_ = output; }
 	
-	virtual void printUsage(std::ostream& out);
-	virtual void setUp();
-	virtual int onRun();
+	virtual void        printUsage(std::ostream& out);
+	virtual void        setUp();
+	virtual int         onRun();
 
 public:
 	AppBase();
