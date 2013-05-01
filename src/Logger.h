@@ -57,6 +57,9 @@ using namespace std;
 namespace cppapp {
 
 
+/**
+ * \brief Enumeration of the logging levels used by Logger. 
+ */
 enum LogLevel {
 	LOG_LVL_NONE,
 	LOG_LVL_ERROR,
@@ -67,7 +70,7 @@ enum LogLevel {
 
 
 /**
- * Logging class.
+ * \brief Simple logging class.
  */
 class Logger : public Object {
 private:

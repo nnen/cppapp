@@ -181,7 +181,7 @@ void ConfigParser::readKey()
 	
 	skipWhitespace();
 	
-	while (isalnum(peek()))
+	while (isKeyChar(peek()))
 		output.put(get());
 	
 	string result = output.str();

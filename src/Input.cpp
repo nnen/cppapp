@@ -14,6 +14,12 @@
 namespace cppapp {
 
 
+/**
+ * \fn string pathBasename(const string &path)
+ *
+ * \note The function uses the basename function from the libgen.h header.
+ * For more information, see <tt>man 3 basename</tt>.
+ */
 string pathBasename(const string &path)
 {
 	char *p = new char[path.size() + 1];

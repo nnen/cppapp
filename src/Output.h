@@ -23,6 +23,9 @@ using namespace std;
 namespace cppapp {
 
 
+/**
+ * \brief Represents an abstract output.
+ */
 class Output : public Object {
 public:
 	virtual ~Output();

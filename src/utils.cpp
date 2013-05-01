@@ -3,7 +3,7 @@
  * \author Jan Milik <milikjan@fit.cvut.cz>
  * \date   2012-03-16
  *
- * \todo Write documentation for the utils.cpp file.
+ * \brief  Implementation file for the utilities declared in utils.h
  */
 
 #include "utils.h"

@@ -3,7 +3,7 @@
  * \author Jan Milik <milikjan@fit.cvut.cz>
  * \date   2012-03-16
  *
- * \todo Write documentation for the utils.h file.
+ * \brief  Header file for various utilities and macros.
  */
 
 
@@ -22,6 +22,9 @@
 using namespace std;
 
 
+/**
+ * \brief Root namespace of the libcppapp library.  
+ */
 namespace cppapp {
 
 

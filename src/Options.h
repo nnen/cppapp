@@ -27,7 +27,7 @@ namespace cppapp {
 
 
 /**
- * Represents a command-line option.
+ * \brief Represents a command-line option.
  */
 struct Option {
 	char        letter;
@@ -100,7 +100,7 @@ struct Option {
 
 
 /**
- * Represents a set of command line options.
+ * \brief Defines and parses command line options.
  */
 class Options {
 public:

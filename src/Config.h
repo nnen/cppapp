@@ -96,6 +96,11 @@ private:
 	string key_;
 	string value_;
 	
+	inline bool isKeyChar(int c)
+	{
+		return (!isspace(c)) && (c != '=');
+	}
+	
 	inline int peek() { return input_->getStream()->peek(); }
 	
 	inline int get()

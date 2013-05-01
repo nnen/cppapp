@@ -23,13 +23,47 @@ using namespace std;
 namespace cppapp {
 
 
+/**
+ * \brief Returns the basename part of a file path.
+ *
+ * For example:
+ * \code{.cpp}
+ * pathBasename("/path/to/a/file"); // returns "file"
+ * \endcode
+ *
+ * \param   path a file path
+ * \returns      basename part of a path
+ */
 string pathBasename(const string &path);
+/**
+ * \brief Returns the entire path without the file extension.
+ *
+ * For example:
+ * \code{.cpp}
+ * pathWithoutExtension("/path/to/a.file"); // returns "/path/to/a"
+ * \endcode
+ *
+ * \param   path a file path
+ * \returns      path without the file extension
+ */
 string pathWithoutExtension(const string &path);
+/**
+ * \brief Returns the entire path with the extension substituted for \p extension.
+ *
+ * For example:
+ * \code{.cpp}
+ * pathWithExtension("/path/to/a.file", "xxx"); // returns "/path/to/a.xxx"
+ * \endcode
+ *
+ * \param path      a file path
+ * \param extension an extension to be used without dot
+ * \returns         \p path with the extension substituted for \p extension
+ */
 string pathWithExtension(const string &path, const string &extension);
 
 
 /**
- * Represents an abstract input.
+ * \brief Represents an abstract input.
  */
 class Input : public Object {
 private:
@@ -58,7 +92,7 @@ public:
 
 
 /**
- * Represents standard input.
+ * \brief Represents standard input.
  */
 class StandardInput : public Input {
 private:
@@ -72,7 +106,7 @@ public:
 
 
 /**
- * Represents an input read from a file.
+ * \brief Represents an input read from a file.
  */
 class FileInput : public Input {
 private:
