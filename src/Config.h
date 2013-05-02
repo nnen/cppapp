@@ -49,8 +49,18 @@ class Config : public Object {
 private:
 	map<string, Ref<ConfigValue> > defaults_;
 	map<string, Ref<ConfigValue> > values_;
+
+	static Ref<Config> globalConfig_;
 	
 public:
+	static Ref<Config> globalConfig()
+	{
+		if (globalConfig_.isNull())
+			globalConfig_ = new Config();
+		return globalConfig_;
+	}
+	static void setGlobalConfig(Ref<Config> config) { globalConfig_ = config; }
+	
 	Config() {}
 	//Config(const Config& other);
 	virtual ~Config() {}

@@ -76,7 +76,7 @@ int AppBase::onRun()
  * Constructor.
  */
 AppBase::AppBase() :
-	config_(new Config()),
+	config_(Config::globalConfig()),
 	output_(new StandardOutput())
 {
 }
