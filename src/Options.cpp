@@ -40,36 +40,39 @@ Options::~Options()
 }
 
 
-void Options::add(char option,
-			   string defaultValue,
+void Options::add(char        option,
+			   string      defaultValue,
 			   const char* metavar,
+			   const char* configKey,
 			   const char* description)
 {
-	options[option] = Option(option, defaultValue, metavar, description);
+	options[option] = Option(option,
+						defaultValue,
+						metavar,
+						configKey,
+						description);
 }
 
 
-void Options::add(char option,
-			   const char * defaultValue,
+void Options::add(char        option,
+			   const char* defaultValue,
 			   const char* metavar,
+			   const char* configKey,
 			   const char* description)
 {
-	add(option, string(defaultValue), metavar, description);
+	add(option, string(defaultValue), metavar, configKey, description);
 }
 
 
-void Options::add(char option,
-			   bool takesArgument,
-			   const char* metavar,
+void Options::add(char        option,
+			   const char* configKey,
 			   const char* description)
 {
-	options[option] = Option(option, takesArgument, metavar, description);
-}
-
-
-void Options::add(char option, const char* description)
-{
-	add(option, false, "", description);
+	options[option] = Option(option,       // letter
+						false,        // takes argument
+						"",           // metavar
+						configKey,    // config key
+						description); // description
 }
 
 
@@ -115,6 +118,14 @@ void Options::parse(int argc, char *argv[])
 Option& Options::get(int opt)
 {
 	return options[opt];
+}
+
+
+void Options::setConfigKeys(Ref<Config> config) const
+{
+	FOR_EACH(options, it) {
+		it->second.setConfigKey(config);
+	}
 }
 
 

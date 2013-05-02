@@ -30,6 +30,7 @@ private:
 
 public:
 	ConfigValue(string name, string rawValue);
+	ConfigValue(string name, bool boolValue);
 	virtual ~ConfigValue() {}
 	
 	string getName() { return name_; }

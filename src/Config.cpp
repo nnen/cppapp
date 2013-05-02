@@ -31,6 +31,12 @@ ConfigValue::ConfigValue(string name, string rawValue) :
 }
 
 
+ConfigValue::ConfigValue(string name, bool boolValue) :
+	name_(name), rawValue_(boolValue ? "true" : "false")
+{
+}
+
+
 /**
  *
  */
@@ -88,7 +94,7 @@ Ref<ConfigValue> Config::get(const string &key)
 {
 	VAR(it, values_.find(key));
 	if (it != values_.end()) return it->second;
-
+	
 	it = defaults_.find(key);
 	if (it != values_.end()) return it->second;
 	

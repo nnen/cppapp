@@ -39,8 +39,12 @@ void AppBase::printUsage(std::ostream& out)
  */
 void AppBase::setUp()
 {
-	options().add('o', true, "OUTPUT_FILE", "Write output to file OUTPUT_FILE.");
-	options().add('h', "Print this help.");
+	options().add('o',
+			    "-",
+			    "OUTPUT_FILE",
+			    CPPAPP_OUTPUT_FILE_CFG_KEY,
+			    "Write output to file OUTPUT_FILE.");
+	options().add('h', "", "Print this help.");
 }
 
 
@@ -54,10 +58,15 @@ int AppBase::onRun()
 		exit(EXIT_SUCCESS);
 	}
 	
-	Option out = options().get('o');
-	if ((bool)out) {
-		output_ = new FileOutput((string)out);
+	VAR(out, config_->get(CPPAPP_OUTPUT_FILE_CFG_KEY));
+	if (out.isNotNull()) {
+		output_ = new FileOutput(out->asString());
 	}
+	
+	//Option out = options().get('o');
+	//if ((bool)out) {
+	//	output_ = new FileOutput((string)out);
+	//}
 	
 	return EXIT_SUCCESS;
 }
@@ -90,6 +99,8 @@ int AppBase::run(int argc, char* argv[])
 	LOG_EXPR(configFileName);
 	ConfigParser parser(config_);
 	parser.parse(new FileInput(configFileName));
+
+	options_.setConfigKeys(config_);
 	
 	return onRun();
 }

@@ -18,6 +18,7 @@
 #include <cstdlib>
 
 #include "utils.h"
+#include "Config.h"
 
 
 using namespace std;
@@ -38,39 +39,46 @@ struct Option {
 	bool        isSet;
 	string      argument;
 	
+	string      configKey;
+	
 	Option() :
 		letter('?'),
 		takesArgument(false),
 		argumentMetavar(""),
 		description(""),
 		isSet(false),
-		argument()
+		argument(),
+		configKey("")
 	{
 	}
 	
 	Option(char letter,
 		  bool takesArgument,
 		  const char* metavar,
+		  const char* configKey,
 		  const char* description = "") :
 		letter(letter),
 		takesArgument(takesArgument),
 		argumentMetavar(metavar),
 		description(description),
 		isSet(false),
-		argument()
+		argument(),
+		configKey(configKey)
 	{	
 	}
 	
 	Option(char letter,
 		  string defaultValue,
 		  const char* metavar,
+		  const char* configKey,
 		  const char* description = "") :
 		letter(letter),
 		takesArgument(true),
 		argumentMetavar(metavar),
 		description(description),
 		isSet(false),
-		argument(defaultValue)
+		argument(defaultValue),
+		configKey(configKey)
 	{
 	}
 	
@@ -94,6 +102,19 @@ struct Option {
 		output << "-" << letter;
 		if (takesArgument) {
 			output << " <" << argumentMetavar << ">";
+		}
+	}
+	
+	void setConfigKey(Ref<Config> config) const
+	{
+		if (configKey.size() == 0) return;
+		
+		if (takesArgument) {
+			if (isSet) {
+				config->set(new ConfigValue(configKey, argument));
+			}
+		} else {
+			config->set(new ConfigValue(configKey, isSet));
 		}
 	}
 };
@@ -125,19 +146,18 @@ public:
 	Options();
 	~Options();
 	
-	void add(char letter,
-		    string defaultValue,
+	void add(char        letter,
+		    string      defaultValue,
 		    const char* metavar,
+		    const char* configKey,
 		    const char* description = "");
-	void add(char letter,
-		    const char * defaultValue,
+	void add(char        letter,
+		    const char* defaultValue,
 		    const char* metavar,
+		    const char* configKey,
 		    const char* description = "");
-	void add(char letter,
-		    bool takesArgument,
-		    const char* metavar,
-		    const char* description = "");
-	void add(char letter,
+	void add(char        letter,
+		    const char* configKey,
 		    const char* description = "");
 	
 	void setUsage(const char* usage) { this->usage = usage; }
@@ -153,6 +173,8 @@ public:
 	char** getArgv() const { return argv; }
 	
 	bool isValid() const { return valid; }
+	
+	void setConfigKeys(Ref<Config> config) const;
 	
 	void printUsage(ostream& output);
 	void dump(ostream& output);

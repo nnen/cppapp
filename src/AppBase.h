@@ -20,6 +20,9 @@
 #include "Logger.h"
 
 
+#define CPPAPP_OUTPUT_FILE_CFG_KEY "output_file"
+
+
 namespace cppapp {
 
 
