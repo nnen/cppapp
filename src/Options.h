@@ -114,7 +114,7 @@ struct Option {
 				config->set(new ConfigValue(configKey, argument));
 			}
 		} else {
-			config->set(new ConfigValue(configKey, isSet));
+			config->set(ConfigValue::make(configKey, isSet));
 		}
 	}
 };

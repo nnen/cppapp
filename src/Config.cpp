@@ -31,12 +31,6 @@ ConfigValue::ConfigValue(string name, string rawValue) :
 }
 
 
-ConfigValue::ConfigValue(string name, bool boolValue) :
-	name_(name), rawValue_(boolValue ? "true" : "false")
-{
-}
-
-
 /**
  *
  */
@@ -61,6 +55,19 @@ int ConfigValue::asInteger() const
 float ConfigValue::asFloat() const
 {
 	return atof(rawValue_.c_str());
+}
+
+
+Ref<ConfigValue> ConfigValue::make(string name, string value)
+{
+	return new ConfigValue(name, value);
+}
+
+
+Ref<ConfigValue> ConfigValue::make(string name, bool value)
+{
+	return new ConfigValue(name,
+					   (value ? "true" : "false"));
 }
 
 

@@ -30,7 +30,6 @@ private:
 
 public:
 	ConfigValue(string name, string rawValue);
-	ConfigValue(string name, bool boolValue);
 	virtual ~ConfigValue() {}
 	
 	string getName() { return name_; }
@@ -39,6 +38,17 @@ public:
 	bool   asBool() const;
 	int    asInteger() const;
 	float  asFloat() const;
+	
+	template<class T>
+	static Ref<ConfigValue> make(string name, T value)
+	{
+		ostringstream s;
+		s << value;
+		return new ConfigValue(name, s.str());
+	}
+	
+	static Ref<ConfigValue> make(string name, string value);
+	static Ref<ConfigValue> make(string name, bool value);
 };
 
 
