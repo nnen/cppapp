@@ -4,3 +4,6 @@ libcppapp_0_2_a_SOURCES = src/AppBase.cpp src/Config.cpp src/Input.cpp src/Logge
 library_includedir=$(includedir)/cppapp-0.2/cppapp
 library_include_HEADERS = src/AppBase.h src/Config.h src/cppapp.h src/Input.h src/Logger.h src/Object.h src/Options.h src/Output.h src/Stopwatch.h src/string_utils.h src/utils.h
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = cppapp-0.2.pc
+
