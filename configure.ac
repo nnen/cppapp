@@ -1,4 +1,4 @@
-AC_PREREQ([2.68])
+# AC_PREREQ([2.68])
 AC_INIT([cppapp], [0.2], [milikjan@fit.cvut.cz])
 AM_INIT_AUTOMAKE([-Wall])
 AC_CONFIG_SRCDIR([config.h.in])

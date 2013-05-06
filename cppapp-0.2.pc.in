@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: cppapp
+Description: Simple CLI application framework.
+Requires: 
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lcppapp-0.2
+Cflags: -I${includedir}/cppapp-0.2
+
