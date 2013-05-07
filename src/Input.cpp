@@ -37,6 +37,8 @@ string pathBasename(const string &path)
 string pathWithoutExtension(const string &path)
 {
 	int dotIndex = path.find_last_of(".");
+	if (dotIndex == string::npos)
+		return path;
 	return path.substr(0, dotIndex);
 }
 

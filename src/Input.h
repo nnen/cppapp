@@ -38,9 +38,12 @@ string pathBasename(const string &path);
 /**
  * \brief Returns the entire path without the file extension.
  *
+ * If the path does not contain extension, the path itself is returned.
+ *
  * For example:
  * \code{.cpp}
  * pathWithoutExtension("/path/to/a.file"); // returns "/path/to/a"
+ * pathWithoutExtension("/path/to/file"); // returns "/path/to/file"
  * \endcode
  *
  * \param   path a file path
