@@ -1,5 +1,5 @@
 # AC_PREREQ([2.68])
-AC_INIT([cppapp], [0.2], [milikjan@fit.cvut.cz])
+AC_INIT([cppapp], [0.2.1], [milikjan@fit.cvut.cz])
 AM_INIT_AUTOMAKE([-Wall])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
@@ -22,6 +22,6 @@ AC_TYPE_UINT32_T
 AC_FUNC_ERROR_AT_LINE
 AC_CHECK_FUNCS([gettimeofday strtol])
 
-AC_CONFIG_FILES([Makefile cppapp-0.2.pc])
+AC_CONFIG_FILES([Makefile cppapp-0.2.1.pc])
 AC_OUTPUT
 
