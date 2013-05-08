@@ -7,6 +7,7 @@
  */
 
 #include "Config.h"
+#include "Logger.h"
 
 #include <cstdlib>
 
@@ -149,8 +150,8 @@ void Config::dump(ostream &output)
  */
 void ConfigParser::handleError()
 {
-	cerr << "ERROR: Error occured while reading configuration from " <<
-		input_->getName() << " on line " << loc_.line << "." << endl;
+	LOG_ERROR("Error occured while reading configuration from " <<
+			input_->getName() << " on line " << loc_.line << ".");
 	error_ = true;
 }
 
@@ -267,6 +268,13 @@ void ConfigParser::parse(Ref<Input> input)
 	error_ = false;
 	key_ = "";
 	value_ = "";
+
+	if (!input->getStream()->good()) {
+		LOG_WARNING("Cannot read configuration from " <<
+				  input->getName() <<
+				  ". If the stream is a file, it may not exist.");
+		return;
+	}
 	
 	if (config_.isNull())
 		config_ = new Config();

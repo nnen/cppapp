@@ -7,6 +7,7 @@
  */
 
 #include "AppBase.h"
+#include "Logger.h"
 
 #include <sstream>
 
@@ -97,9 +98,15 @@ int AppBase::run(int argc, char* argv[])
 	string configFileName = config_->get("config_file",
 								  getDefaultConfigFile())->asString();
 	LOG_EXPR(configFileName);
-	ConfigParser parser(config_);
-	parser.parse(new FileInput(configFileName));
-
+	Ref<FileInput> configInput = new FileInput(configFileName);
+	if (configInput->exists()) {
+		ConfigParser parser(config_);
+		parser.parse(new FileInput(configFileName));
+		configInput->close();
+	} else {
+		LOG_WARNING("Configuration file " << configFileName << " does not exist.");
+	}
+	
 	options_.setConfigKeys(config_);
 	
 	return onRun();
