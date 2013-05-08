@@ -1,8 +1,8 @@
 lib_LIBRARIES = libcppapp.a
-libcppapp_a_SOURCES = src/AppBase.cpp src/Config.cpp src/Input.cpp src/Logger.cpp src/Object.cpp src/Options.cpp src/Output.cpp src/Stopwatch.cpp src/string_utils.cpp src/utils.cpp
+libcppapp_a_SOURCES = cppapp/AppBase.cpp cppapp/Config.cpp cppapp/Input.cpp cppapp/Logger.cpp cppapp/Object.cpp cppapp/Options.cpp cppapp/Output.cpp cppapp/Stopwatch.cpp cppapp/string_utils.cpp cppapp/utils.cpp
 
 library_includedir=$(includedir)/cppapp-@PACKAGE_VERSION@/cppapp
-library_include_HEADERS = src/AppBase.h src/Config.h src/cppapp.h src/Input.h src/Logger.h src/Object.h src/Options.h src/Output.h src/Stopwatch.h src/string_utils.h src/utils.h
+library_include_HEADERS = cppapp/AppBase.h cppapp/Config.h cppapp/Input.h cppapp/Logger.h cppapp/Object.h cppapp/Options.h cppapp/Output.h cppapp/Stopwatch.h cppapp/cppapp.h cppapp/string_utils.h cppapp/utils.h
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = cppapp-@PACKAGE_VERSION@.pc
