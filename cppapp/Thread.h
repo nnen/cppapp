@@ -10,6 +10,9 @@
 #define THREAD_K9TW92HX
 
 
+#include <cassert>
+using namespace std;
+
 #include <pthread.h>
 
 
@@ -41,11 +44,45 @@ public:
 	/**
 	 * Destructor.
 	 */
-	~Thread();
-
+	virtual ~Thread();
+	
 	void* join();
 	
 	virtual void* run() = 0;
+};
+
+
+/**
+ * \todo Write documentation for class MethodThread : public Thread.
+ */
+template<class TReturn, class TClass>
+class MethodThread : public Thread {
+public:
+	typedef TReturn* (TClass::*Method)();
+
+private:
+	TClass  *instance_;
+	Method   method_;
+	TReturn *returnValue_;
+	
+public:
+	MethodThread(TClass *instance, Method method) :
+		instance_(instance),
+		method_(method)
+	{
+		assert(instance != NULL);
+		assert(method != NULL);
+	}
+	
+	virtual ~MethodThread() {}
+	
+	virtual void* run()
+	{
+		returnValue_ = instance_->*method_();
+		return returnValue_;
+	}
+	
+	TReturn* returnValue() const { return returnValue_; }
 };
 
 

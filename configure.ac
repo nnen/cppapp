@@ -9,6 +9,11 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_RANLIB
 
+# Checks for libraries.
+AC_CHECK_LIB(pthread, pthread_create, [], [ echo "ERROR!: pthread_create in libpthread not found!"; exit -1], [])
+AC_CHECK_LIB(pthread, pthread_mutex_init, [], [ echo "ERROR!: pthread_mutex_init in libpthread not found!"; exit -1], [])
+AC_CHECK_LIB(pthread, pthread_cond_init, [], [ echo "ERROR!: pthread_cond_init in libpthread not found!"; exit -1], [])
+
 # Checks for header files.
 AC_CHECK_HEADERS([stdint.h sys/time.h])
 
@@ -27,9 +32,6 @@ AC_TYPE_SIGNAL
 AC_FUNC_STAT
 AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([gettimeofday strerror strtol])
-AC_CHECK_LIB(pthread, pthread_create, [], [ echo "ERROR!: pthread_create in libpthread not found!"; exit -1], [])
-AC_CHECK_LIB(pthread, pthread_mutex_init, [], [ echo "ERROR!: pthread_mutex_init in libpthread not found!"; exit -1], [])
-AC_CHECK_LIB(pthread, pthread_cond_init, [], [ echo "ERROR!: pthread_cond_init in libpthread not found!"; exit -1], [])
 
 AC_CONFIG_FILES([Makefile cppapp-0.2.1.pc])
 AC_OUTPUT

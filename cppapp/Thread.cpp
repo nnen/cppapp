@@ -15,13 +15,17 @@ namespace cppapp {
 
 void* Thread::threadFunction(void *arg)
 {
+	LOG_DEBUG("Thread started...");
 	Thread *t = (Thread*)arg;
-	return t->run();
+	void *result = t->run();
+	LOG_DEBUG("Returning from thread...");
+	return result;
 }
 
 
 void Thread::exit(void *result)
 {
+	LOG_DEBUG("Exiting thread...");
 	pthread_exit(result);
 }
 
@@ -37,8 +41,6 @@ Thread::Thread()
 
 Thread::~Thread()
 {
-	//Error err = pthread_destroy(&thread_);
-	//err.exit();
 }
 
 
