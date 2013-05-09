@@ -1,0 +1,15 @@
+rm -fR .deps
+rm -fR autom4te.cache
+
+rm -f *.o
+
+rm -f aclocal.m4
+rm -f config.h config.h.in config.log config.status
+rm -f configure
+rm -f *.pc
+rm -f depcomp
+rm -f install-sh
+rm -f *.a
+rm -f missing
+rm -f stamp-h1
+
