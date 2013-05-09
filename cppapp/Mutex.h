@@ -34,12 +34,12 @@ private:
 public:
 	MutexAttributes()
 	{
-		int err = pthread_mutexattr_init(&attr_);
+		HANDLE_SYSERR(pthread_mutexattr_init(&attr_));
 	}
 	
 	~MutexAttributes()
 	{
-		pthread_mutexattr_destroy(&attr_);
+		HANDLE_SYSERR(pthread_mutexattr_destroy(&attr_));
 	}
 };
 

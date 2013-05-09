@@ -21,7 +21,7 @@
 #include "Stopwatch.h"
 #include "Thread.h"
 #include "string_utils.h"
-#include "utils.h
+#include "utils.h"
 
 #endif /* end of include guard: CPPAPP_XKJCG2SU */
 
