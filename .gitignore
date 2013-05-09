@@ -4,6 +4,8 @@
 libcppapp*.a
 cppapp*.tar.gz
 
+*.pc
+Makefile
 .deps
 configure
 Makefile.in
