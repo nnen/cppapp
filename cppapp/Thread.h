@@ -67,6 +67,7 @@ private:
 	
 public:
 	MethodThread(TClass *instance, Method method) :
+		Thread(),
 		instance_(instance),
 		method_(method)
 	{
@@ -78,7 +79,7 @@ public:
 	
 	virtual void* run()
 	{
-		returnValue_ = instance_->*method_();
+		returnValue_ = (instance_->*method_)();
 		return returnValue_;
 	}
 	

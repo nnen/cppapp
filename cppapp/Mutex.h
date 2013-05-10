@@ -94,6 +94,7 @@ public:
 	
 	void lock()
 	{
+		LOG_DEBUG("Locking mutex...");
 		HANDLE_SYSERR(pthread_mutex_lock(&mutex_));
 	}
 	

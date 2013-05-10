@@ -8,6 +8,7 @@
 
 #include "Thread.h"
 #include "Exception.h"
+#include "Logger.h"
 
 
 namespace cppapp {
@@ -35,6 +36,7 @@ void Thread::exit(void *result)
  */
 Thread::Thread()
 {
+	LOG_DEBUG("Starting thread...");
 	HANDLE_SYSERR(pthread_create(&thread_, NULL, threadFunction, this))
 }
 
