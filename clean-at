@@ -1,3 +1,7 @@
+#!/bin/sh
+
+make maintainer-clean || true
+
 rm -fR .deps
 rm -fR autom4te.cache
 
@@ -12,4 +16,6 @@ rm -f install-sh
 rm -f *.a
 rm -f missing
 rm -f stamp-h1
+rm -f Makefile.in
 
+rm -f configure.scan autoscan.log
