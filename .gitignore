@@ -4,6 +4,8 @@
 libcppapp*.a
 cppapp*.tar.gz
 
+docs
+
 *.pc
 Makefile
 .deps
