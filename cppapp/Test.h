@@ -172,7 +172,7 @@ struct TestResult {
 	const char   *file;
 	int           line;
 	
-	const char   *assertion;
+	std::string   assertion;
 	const char   *message;
 	
 	TestBacktrace backtrace;
@@ -191,6 +191,13 @@ struct TestResult {
 	
 	TestResult(bool success, const char *file, int line,
 			 const char *assertion, const char *message) :
+		success(success), exception(false),
+		hasLocation(true), file(file), line(line),
+		assertion(assertion), message(message)
+	{}
+	
+	TestResult(bool success, const char *file, int line,
+			 std::string assertion, const char *message) :
 		success(success), exception(false),
 		hasLocation(true), file(file), line(line),
 		assertion(assertion), message(message)
@@ -294,6 +301,7 @@ struct TestSuiteRegistration {
 	std::stringstream tmpStream_; \
 	tmpStream_ << #expected " == " #got; \
 	tmpStream_ << "  (" << expectedValue_ << " == " << gotValue_ << ")"; \
+	PRINT_EXPR(tmpStream_.str()); \
 	assert_(expectedValue_ == gotValue_, \
 	        __FILE__, __LINE__, \
 	        tmpStream_.str().c_str(), message); \

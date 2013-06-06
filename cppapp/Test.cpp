@@ -220,7 +220,7 @@ void TextTestRunner::addTestResult(Ref<TestRef> test, TestResult result)
 		if (result.message != NULL)
 			*output_ << "\tMessage: " << result.message << endl;
 	} else if (!result.success) {
-		if (result.assertion != NULL)
+		if (result.assertion.size() > 0)
 			*output_ << "\tAssertion " << result.assertion << " failed at " <<
 			    result.file << ":" << result.line << "." << endl;
 		else
