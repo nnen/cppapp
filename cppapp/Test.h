@@ -15,8 +15,8 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <stdio.h>
 #include <execinfo.h>
+#include <stdio.h>
 
 #include "Object.h"
 #include "utils.h"
@@ -103,32 +103,6 @@ public:
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// TEST FAILURE
-////////////////////////////////////////////////////////////////////////////////
-
-
-class TestFailure : public std::exception {
-private:
-	const char *file_;
-	int         line_;
-
-	const char *assertion_;
-	const char *message_;
-
-public:
-	TestFailure(const char *file, int line,
-			  const char *assertion, const char *message) :
-		file_(file), line_(line), assertion_(assertion), message_(message)
-	{}
-	
-	const char* file() const      { return file_; }
-	int         line() const      { return line_; }
-	const char* assertion() const { return assertion_; }
-	const char* message() const   { return message_; }
-};
-
-
-////////////////////////////////////////////////////////////////////////////////
 // TEST REF
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -191,15 +165,15 @@ public:
 
 
 struct TestResult {
-	bool         success;
-	bool         exception;
+	bool          success;
+	bool          exception;
 	
-	bool         hasLocation;
-	const char  *file;
-	int          line;
+	bool          hasLocation;
+	const char   *file;
+	int           line;
 	
-	const char  *assertion;
-	const char  *message;
+	const char   *assertion;
+	const char   *message;
 	
 	TestBacktrace backtrace;
 	
@@ -222,11 +196,7 @@ struct TestResult {
 		assertion(assertion), message(message)
 	{}
 	
-	TestResult(std::exception &e) :
-		success(false), exception(true),
-		hasLocation(false), file(""), line(0),
-		assertion(""), message(e.what())
-	{}
+	TestResult(std::exception &e);
 	
 	TestResult(std::exception &e,
 			 const TestBacktrace &backtrace);
@@ -265,7 +235,7 @@ class TestSuite : public Object {
 private:
 	std::vector<Ref<TestRef> >  tests_;
 	
-	static TestSuite defaultSuite_;
+	//static TestSuite defaultSuite_;
 
 public:
 	typedef std::vector<Ref<TestRef> >::iterator Iterator;
@@ -285,7 +255,7 @@ public:
 	
 	void run();
 	
-	static TestSuite& getDefaultSuite() { return defaultSuite_; }
+	static TestSuite& getDefaultSuite(); // { return defaultSuite_; }
 	static void runDefault();
 };
 
@@ -372,10 +342,10 @@ private:
 	int failureCount_;
 	
 protected:
-	virtual void startTests(const TestSuite &tests) = 0;
-	virtual void finishTests(const TestSuite &tests) = 0;
-	virtual void startTest(Ref<TestRef> test) = 0;
-	virtual void addTestResult(Ref<TestRef> test, TestResult result) = 0;
+	virtual void startTests(const TestSuite &tests) {}
+	virtual void finishTests(const TestSuite &tests) {}
+	virtual void startTest(Ref<TestRef> test) {}
+	virtual void addTestResult(Ref<TestRef> test, TestResult result) {}
 
 public:
 	int getTestCount() const { return testCount_; }

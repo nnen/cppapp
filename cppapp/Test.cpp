@@ -28,12 +28,10 @@ TestResult TestRef::run()
 	
 	try {
 		executeMethod();
-	} catch (TestFailure &e) {
-		result = TestResult(false, e.file(), e.line(), e.assertion(), e.message());
+	} catch (TestResult &r) {
+		result = r;
 	} catch (std::exception &e) {
-		TestBacktrace backtrace;
-		backtrace.get();
-		result = TestResult(e, backtrace);
+		result = TestResult(e);
 	} catch (...) {
 		result = TestResult(false, "", 0, "", "unknown exception");
 	}
@@ -52,14 +50,23 @@ TestResult TestRef::run()
 /**
  * Constructor.
  */
+TestResult::TestResult(std::exception &e) :
+	success(false), exception(true),
+	hasLocation(false), file(""), line(0),
+	assertion(""), message(e.what())
+{ }
+
+
+/**
+ * Constructor.
+ */
 TestResult::TestResult(std::exception &e,
 				   const TestBacktrace &backtrace) :
 	success(false), exception(true),
 	hasLocation(false), file(""), line(0),
 	assertion(""), message(e.what()),
 	backtrace(backtrace)
-{
-}
+{ }
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -78,7 +85,7 @@ void TestResults::add(const TestResults &result)
 ////////////////////////////////////////////////////////////////////////////////
 
 
-TestSuite TestSuite::defaultSuite_;
+//TestSuite TestSuite::defaultSuite_;
 
 
 TestSuite::~TestSuite()
@@ -109,6 +116,13 @@ void TestSuite::run()
 }
 
 
+TestSuite& TestSuite::getDefaultSuite()
+{
+	static TestSuite defaultSuite;
+	return defaultSuite;
+}
+
+
 void TestSuite::runDefault()
 {
 	getDefaultSuite().run();
@@ -124,7 +138,8 @@ void TestCase::assert_(bool value, const char *file, int line,
 				   const char *assertion, const char *message)
 {
 	if (!value)
-		throw TestFailure(file, line, assertion, message);
+		throw TestResult(value, file, line, assertion, message);
+		//throw TestFailure(file, line, assertion, message);
 }
 
 

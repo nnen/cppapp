@@ -6,11 +6,13 @@ using namespace std;
 using namespace cppapp;
 
 
+RUN_SUITE(TestTestCase);
+
+
 class App : public AppBase {
 protected:
 	virtual int onRun()
 	{
-		RUN_SUITE(TestTestCase);
 		TestSuite::runDefault();
 		
 		return 0;
