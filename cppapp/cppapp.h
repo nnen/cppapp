@@ -20,6 +20,7 @@
 #include "Output.h"
 #include "Stopwatch.h"
 #include "Thread.h"
+#include "Test.h"
 #include "string_utils.h"
 #include "utils.h"
 
