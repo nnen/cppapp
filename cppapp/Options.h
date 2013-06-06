@@ -16,6 +16,7 @@
 #include <vector>
 #include <map>
 #include <cstdlib>
+#include <unistd.h>
 
 #include "utils.h"
 #include "Config.h"
