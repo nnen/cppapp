@@ -107,7 +107,7 @@ Ref<ConfigValue> Config::get(const string &key)
 	if (it != values_.end()) return it->second;
 	
 	it = defaults_.find(key);
-	if (it != values_.end()) return it->second;
+	if (it != defaults_.end()) return it->second;
 	
 	return NULL;
 }
