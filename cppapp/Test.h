@@ -121,6 +121,7 @@ public:
 	virtual void executeMethod() = 0;
 	
 	virtual TestResult run();
+	virtual TestResult debug();
 };
 
 
@@ -193,7 +194,7 @@ struct TestResult {
 			 const char *assertion, const char *message) :
 		success(success), exception(false),
 		hasLocation(true), file(file), line(line),
-		assertion(assertion), message(message)
+		assertion(assertion == NULL ? "" : assertion), message(message)
 	{}
 	
 	TestResult(bool success, const char *file, int line,
@@ -261,6 +262,7 @@ public:
 	virtual ConstIterator end() const   { return tests_.end(); }
 	
 	void run();
+	void debug();
 	
 	static TestSuite& getDefaultSuite(); // { return defaultSuite_; }
 	static void runDefault();
@@ -301,7 +303,6 @@ struct TestSuiteRegistration {
 	std::stringstream tmpStream_; \
 	tmpStream_ << #expected " == " #got; \
 	tmpStream_ << "  (" << expectedValue_ << " == " << gotValue_ << ")"; \
-	PRINT_EXPR(tmpStream_.str()); \
 	assert_(expectedValue_ == gotValue_, \
 	        __FILE__, __LINE__, \
 	        tmpStream_.str().c_str(), message); \
@@ -354,12 +355,18 @@ protected:
 	virtual void finishTests(const TestSuite &tests) {}
 	virtual void startTest(Ref<TestRef> test) {}
 	virtual void addTestResult(Ref<TestRef> test, TestResult result) {}
+	
+	virtual void startDebug(const TestSuite &tests) {}
+	virtual void finishDebug(const TestSuite &tests) {}
+	virtual void startTestDebug(Ref<TestRef> test) {}
+	virtual void finishTestDebug(Ref<TestRef> test, TestResult result) {}
 
 public:
 	int getTestCount() const { return testCount_; }
 	int getFailureCount() const { return failureCount_; }
 	
 	virtual void run(const TestSuite &tests);
+	virtual void debug(const TestSuite &tests);
 };
 
 
@@ -373,6 +380,9 @@ protected:
 	
 	virtual void startTest(Ref<TestRef> test);
 	virtual void addTestResult(Ref<TestRef> test, TestResult result);
+
+	virtual void startDebug(const TestSuite &tests);
+	virtual void startTestDebug(Ref<TestRef> test);
 
 public:
 	TextTestRunner(std::ostream *output) : output_(output) {}

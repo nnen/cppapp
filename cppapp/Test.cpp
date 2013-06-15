@@ -42,6 +42,18 @@ TestResult TestRef::run()
 }
 
 
+TestResult TestRef::debug()
+{
+	TestResult result;
+	
+	setUp();
+	executeMethod();
+	tearDown();
+	
+	return result;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // TEST RESULT
 ////////////////////////////////////////////////////////////////////////////////
@@ -116,6 +128,13 @@ void TestSuite::run()
 }
 
 
+void TestSuite::debug()
+{
+	TextTestRunner runner;
+	runner.debug(*this);
+}
+
+
 TestSuite& TestSuite::getDefaultSuite()
 {
 	static TestSuite defaultSuite;
@@ -175,6 +194,22 @@ void TestRunner::run(const TestSuite &tests)
 }
 
 
+void TestRunner::debug(const TestSuite &tests)
+{
+	startDebug(tests);
+	
+	FOR_EACH(tests, test) {
+		startTestDebug(*test);
+		
+		TestResult result = (*test)->debug();
+		
+		finishTestDebug(*test, result);
+	}
+	
+	finishDebug(tests);
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // TEXT TEST RUNNER
 ////////////////////////////////////////////////////////////////////////////////
@@ -210,9 +245,9 @@ void TextTestRunner::startTest(Ref<TestRef> test)
 void TextTestRunner::addTestResult(Ref<TestRef> test, TestResult result)
 {
 	if (result.exception)
-		*output_ << (result.success ? "OK" : "\033[1;31mEXCEPTION\033[0m");
+		*output_ << (result.success ? "OK" : "\033[1;31mEXCEPTION\033[0m") << std::flush;
 	else
-		*output_ << (result.success ? "OK" : "\033[1;31mFAILURE\033[0m");
+		*output_ << (result.success ? "OK" : "\033[1;31mFAILURE\033[0m") << std::flush;
 	*output_ << std::endl << std::flush;
 	
 	if (result.exception) {
@@ -230,6 +265,20 @@ void TextTestRunner::addTestResult(Ref<TestRef> test, TestResult result)
 		if (result.message != NULL)
 			*output_ << "\tMessage: " << result.message << endl;
 	}
+}
+
+
+void TextTestRunner::startDebug(const TestSuite &tests)
+{
+	*output_ << "Debugging " << tests.getCount() << " tests..." << std::endl;
+}
+
+
+void TextTestRunner::startTestDebug(Ref<TestRef> test)
+{
+	*output_ << test->getTestCase()->getName() <<
+		"::" << test->getName() << "... " <<
+		std::endl << std::flush;
 }
 
 

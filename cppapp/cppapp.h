@@ -21,6 +21,7 @@
 #include "Stopwatch.h"
 #include "Thread.h"
 #include "Test.h"
+#include "TestApp.h"
 #include "string_utils.h"
 #include "utils.h"
 

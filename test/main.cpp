@@ -8,17 +8,20 @@ using namespace cppapp;
 
 RUN_SUITE(TestTestCase);
 
-
-class App : public AppBase {
-protected:
-	virtual int onRun()
-	{
-		TestSuite::runDefault();
-		
-		return 0;
-	}
-};
+TESTAPP_BOOTSTRAP;
 
 
-CPPAPP_BOOTSTRAP
+//class App : public AppBase {
+//protected:
+//	virtual int onRun()
+//	{
+//		//TestSuite::runDefault();
+//		TestSuite::getDefaultSuite().debug();
+//		
+//		return 0;
+//	}
+//};
+//
+//
+//CPPAPP_BOOTSTRAP
 
