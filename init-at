@@ -1,0 +1,22 @@
+#!/bin/sh
+
+
+#####################################################################
+DEBUG_PREFIX=$HOME/dbg
+#####################################################################
+
+
+rm -fR release debug
+
+autoreconf --install
+
+mkdir release
+cd release
+../configure
+cd ..
+
+mkdir debug
+cd debug
+../configure --prefix=${DEBUG_PREFIX} CPPFLAGS=-DDEBUG CXXFLAGS="-g -O0"
+cd ..
+
