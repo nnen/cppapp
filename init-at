@@ -3,20 +3,28 @@
 
 #####################################################################
 DEBUG_PREFIX=$HOME/dbg
+DEBUG_CPPFLAGS=-DDEBUG
+DEBUG_CXXFLAGS="-g -O0"
 #####################################################################
 
 
 rm -fR release debug
 
+echo "==== Creating autotools files... ======================================"
 autoreconf --install
 
+echo "==== Configuring release target... ===================================="
 mkdir release
 cd release
-../configure
+../configure -q
 cd ..
 
+echo "==== Configuring debug target... ======================================"
 mkdir debug
 cd debug
-../configure --prefix=${DEBUG_PREFIX} CPPFLAGS=-DDEBUG CXXFLAGS="-g -O0"
+echo "PREFIX   = ${DEBUG_PREFIX}"
+echo "CPPFLAGS = ${DEBUG_CPPFLAGS}"
+echo "CXXFLAGS = ${DEBUG_CXXFLAGS}"
+../configure -q --prefix=${DEBUG_PREFIX} CPPFLAGS=${DEBUG_CPPFLAGS} CXXFLAGS="${DEBUG_CXXFLAGS}"
 cd ..
 
