@@ -11,7 +11,7 @@ CPP_FILES    = $(shell ls cppapp/*.cpp)
 OBJECT_FILES = $(foreach CPP_FILE, $(CPP_FILES), $(patsubst %.cpp,%.o,$(CPP_FILE)))
 DEP_FILES    = $(foreach CPP_FILE, $(CPP_FILES), $(patsubst %.cpp,%.d,$(CPP_FILE)))
 
-CXXFLAGS     = -g
+CXXFLAGS     = -Wall -ggdb3 -O0
 LDFLAGS      =
 
 

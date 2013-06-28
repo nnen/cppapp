@@ -9,6 +9,7 @@
 #ifndef CPPAPP_XKJCG2SU
 #define CPPAPP_XKJCG2SU
 
+#include "Debug.h"
 #include "AppBase.h"
 #include "Config.h"
 #include "Exception.h"

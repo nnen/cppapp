@@ -100,6 +100,16 @@ void TestResults::add(const TestResults &result)
 //TestSuite TestSuite::defaultSuite_;
 
 
+TestSuite::TestSuite() :
+	name_("<Unnamed>")
+{ }
+
+
+TestSuite::TestSuite(std::string name) :
+	name_(name)
+{ }
+
+
 TestSuite::~TestSuite()
 {
 	FOR_EACH(tests_, test) {
@@ -226,7 +236,7 @@ void TextTestRunner::finishTests(const TestSuite &tests)
 	for (int i = 0; i < 80; i++)
 		*output_ << "=";
 	*output_ << std::endl;
-	*output_ << getTestCount() << " tests run, ";
+	*output_ << "\033[1m" << getTestCount() << " tests run, ";
 	
 	if (getFailureCount() == 0)
 		*output_ << getFailureCount() << " failures." << std::endl;
@@ -245,7 +255,7 @@ void TextTestRunner::startTest(Ref<TestRef> test)
 void TextTestRunner::addTestResult(Ref<TestRef> test, TestResult result)
 {
 	if (result.exception)
-		*output_ << (result.success ? "OK" : "\033[1;31mEXCEPTION\033[0m") << std::flush;
+		*output_ << (result.success ? "OK" : "\033[1;33mEXCEPTION\033[0m") << std::flush;
 	else
 		*output_ << (result.success ? "OK" : "\033[1;31mFAILURE\033[0m") << std::flush;
 	*output_ << std::endl << std::flush;
@@ -290,8 +300,8 @@ void TextTestRunner::startTestDebug(Ref<TestRef> test)
 /**
  * Constructor.
  */
-TestTestCase::TestTestCase(const char *name) :
-	TestCase(name)
+TestTestCase::TestTestCase() :
+	TestCase()
 {
 	TEST_ADD(TestTestCase, noFailureTest);
 	TEST_ADD(TestTestCase, unconditionalFailureTest);
@@ -302,8 +312,28 @@ TestTestCase::TestTestCase(const char *name) :
 }
 
 
+class LocalTestCase : public TestCase {
+public:
+	void noFailureTest() {}
+	
+	LocalTestCase() : TestCase()
+	{
+		TEST_ADD(LocalTestCase, noFailureTest);
+	}
+};
+
+
 void TestTestCase::noFailureTest()
-{}
+{
+	//LocalTestCase testCase;
+	Ref<TestCase> testCase = new LocalTestCase();
+	
+	TestRunner runner;
+	runner.run(*testCase);
+	
+	TEST_EQUALS(1, runner.getTestCount(), "1 test should have been executed.");
+	TEST_EQUALS(0, runner.getFailureCount(), "0 failures should have occured.");
+}
 
 
 void TestTestCase::unconditionalFailureTest()
