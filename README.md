@@ -1,14 +1,14 @@
 cppapp
 ======
 
-Private C++ command-line toolbox.  I started out as a collection of reusable
+Private C++ command-line toolbox.  It started out as a collection of reusable
 classes I wrote for various shool assignments where I was allowed to use only
 my own code.
 
 Compiles to statically-linked library.
 
 
-Compilation and installation
+Compilation and Installation
 ----------------------------
 
 There are 3 methods:
