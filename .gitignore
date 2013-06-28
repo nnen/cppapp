@@ -3,6 +3,7 @@
 *.swp
 libcppapp*.a
 cppapp*.tar.gz
+test/test
 
 docs
 

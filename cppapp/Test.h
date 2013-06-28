@@ -10,13 +10,15 @@
 #define TEST_N6WIX7RO
 
 
+#include <stdio.h>
+#include <execinfo.h>
+#include <cassert>
+
 #include <exception>
 #include <vector>
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <execinfo.h>
-#include <stdio.h>
 
 #include "Object.h"
 #include "utils.h"
@@ -109,11 +111,11 @@ public:
 
 class TestRef : public Object {
 protected:
-	const char *name_;
+	std::string name_;
 public:
-	TestRef(const char *name) : name_(name) {}
+	TestRef(const std::string& name) : name_(name) {}
 	
-	const char* getName() const { return name_; }
+	std::string getName() const { return name_; }
 	virtual Ref<TestCase> getTestCase() = 0;
 	
 	virtual void setUp() = 0;
@@ -132,10 +134,10 @@ private:
 	void (T::*method_)();
 
 public:
-	TestRef_(const char *name) : TestRef(name), instance_(NULL), method_(NULL)
-	{ }
+	//TestRef_(const char *name) : TestRef(name), instance_(NULL), method_(NULL)
+	//{ }
 	
-	TestRef_(const char *name, Ref<T> instance, void (T::*method)()) :
+	TestRef_(const std::string& name, Ref<T> instance, void (T::*method)()) :
 		TestRef(name), instance_(instance), method_(method)
 	{ }
 	
@@ -241,7 +243,9 @@ public:
 
 class TestSuite : public Object {
 private:
-	std::vector<Ref<TestRef> >  tests_;
+	std::string name_;
+	
+	std::vector<Ref<TestRef> > tests_;
 	
 	//static TestSuite defaultSuite_;
 
@@ -249,7 +253,12 @@ public:
 	typedef std::vector<Ref<TestRef> >::iterator Iterator;
 	typedef std::vector<Ref<TestRef> >::const_iterator ConstIterator;
 	
+	TestSuite();
+	TestSuite(std::string name);
 	virtual ~TestSuite();
+	
+	std::string getName() const { return name_; }
+	void        setName(const std::string& value) { name_ = value; }
 	
 	virtual void add(Ref<TestRef> test);
 	virtual void add(const TestSuite &suite);
@@ -274,14 +283,14 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 
-#define RUN_SUITE(name) TestSuiteRegistration<name> testSuite_##name(#name);
+#define RUN_SUITE(name) TestSuiteRegistration<name> testSuite_##name;
 
 
 template<class T>
 struct TestSuiteRegistration {
-	TestSuiteRegistration(const char *name)
+	TestSuiteRegistration()
 	{
-		Ref<T> suite = new T(name);
+		Ref<T> suite = new T();
 		TestSuite::getDefaultSuite().add(*suite);
 	}
 };
@@ -292,7 +301,7 @@ struct TestSuiteRegistration {
 ////////////////////////////////////////////////////////////////////////////////
 
 
-#define TEST_ADD(suite, method) registerTest(&suite::method, #method);
+#define TEST_ADD(testCase, method) registerTest(&testCase::method, #method, #testCase);
 
 #define TEST_ASSERT(expr, message) \
 	assert_((expr), __FILE__, __LINE__, #expr, message);
@@ -313,16 +322,18 @@ struct TestSuiteRegistration {
 
 
 class TestCase : public TestSuite {
-private:
-	const char *name_;
-
 protected:
-	TestCase(const char *name) : name_(name)
+	TestCase() : TestSuite()
 	{}
 	
 	template<class T>
-	void registerTest(void (T::*method)(), const char *name)
+	void registerTest(void (T::*method)(), std::string name, std::string caseName)
 	{
+		// Set the name of this test case.
+		//name_.assign(name, 0, colonPos);
+		setName(caseName);
+		
+		// Add the test to the list of this test case's test list.
 		add(new TestRef_<T>(name, (T*)this, method));
 	}
 	
@@ -331,8 +342,6 @@ protected:
 			   const char *assertion, const char *message);
 	
 public:
-	const char* getName() const { return name_; }
-	
 	virtual void setUp() {}
 	virtual void tearDown() {}
 	
@@ -398,7 +407,7 @@ public:
 
 class TestTestCase : public TestCase {
 public:
-	TestTestCase(const char *name);
+	TestTestCase();
 	
 	void noFailureTest();
 	void unconditionalFailureTest();

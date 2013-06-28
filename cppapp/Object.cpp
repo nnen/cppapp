@@ -12,6 +12,7 @@
 #include <iostream>
 
 #include "Object.h"
+#include "Debug.h"
 
 
 namespace cppapp {
@@ -42,14 +43,16 @@ void Object::claim()
 
 void Object::checkHealth() const
 {
-	assert(refCount_ >= 0);
-	assert(sentinel_ == SENTINEL);
+	CPPAPP_ASSERT(refCount_ >= 0);
+	CPPAPP_ASSERT(sentinel_ == SENTINEL);
 }
 
 
 Object* Object::release(Object* obj)
 {
 	if (obj != NULL) obj->checkHealth();
+	
+	CPPAPP_ASSERT(obj->refCount_ > 0);
 	
 	if (--(obj->refCount_) <= 0) {
 		delete obj;

@@ -65,6 +65,22 @@ public:
 };
 
 
+/**
+ * Represents a reference-counted object.
+ *
+ * \note Instances of classes derived from Object may not be allocated on stack. For example:
+ *
+ * \code
+ * class SomeClass : public Object {
+ * }
+ *
+ * int main(void) {
+ *     SomeClass instance;
+ *     // do something
+ *     // throws assertion exception here if compiled without NDEBUG
+ * }
+ * \endcode
+ */
 class Object {
 private:
 	int refCount_;
@@ -265,7 +281,7 @@ public:
 		if (ptr_ != NULL) ptr_->checkHealth();
 		return ptr_;
 	}
-
+	
 	template<class U>
 	Ref<U> as() const
 	{

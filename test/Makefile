@@ -13,7 +13,7 @@ H_FILES      =
 OBJECT_FILES = $(foreach CPP_FILE, $(CPP_FILES), $(patsubst %.cpp,%.o,$(CPP_FILE)))
 DEP_FILES    = $(foreach CPP_FILE, $(CPP_FILES), $(patsubst %.cpp,%.d,$(CPP_FILE)))
 
-CXXFLAGS     = -g -O0 -Wall -I..
+CXXFLAGS     = -ggdb3 -O0 -Wall -I..
 LDFLAGS      = -L.. -lcppapp -rdynamic
 
 ECHO         = $(shell which echo)
