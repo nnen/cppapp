@@ -17,6 +17,6 @@ cd ..
 
 mkdir debug
 cd debug
-../configure --prefix=${DEBUG_PREFIX} CPPFLAGS=-DDEBUG CXXFLAGS="-g -O0"
+../configure --prefix=${DEBUG_PREFIX} CPPFLAGS=-DDEBUG CXXFLAGS="-Wall -ggdb3 -O0"
 cd ..
 
