@@ -9,4 +9,5 @@ call OpenCpp("cppapp/Output")
 call OpenCpp("cppapp/Options")
 call OpenCpp("cppapp/AppBase")
 call OpenCpp("cppapp/Stopwatch")
+call OpenCpp("cppapp/Test")
 
