@@ -19,3 +19,9 @@ There are 3 methods:
  * Use the `init-at` script, which will create `release` and `debug`
    subdirectories with appropriatly configured Makefiles.
 
+
+Documentation
+-------------
+
+The API reference, such as it is, can be found at http://milik.cz/~jan/cppapp/docs .
+

@@ -3,13 +3,17 @@
 #
 
 
+PROJECT_NAME = cppapp
 BIN_NAME     = libcppapp.a
+VERSION      = 0.2
 # yes / no
 IS_LIBRARY   = yes
 
 CPP_FILES    = $(shell ls cppapp/*.cpp)
 OBJECT_FILES = $(foreach CPP_FILE, $(CPP_FILES), $(patsubst %.cpp,%.o,$(CPP_FILE)))
 DEP_FILES    = $(foreach CPP_FILE, $(CPP_FILES), $(patsubst %.cpp,%.d,$(CPP_FILE)))
+
+DOCS_ARCH    = $(PROJECT_NAME)-$(VERSION)-docs.html.tar.gz
 
 CXXFLAGS     = -Wall -ggdb3 -O0
 LDFLAGS      =
@@ -26,7 +30,20 @@ build: $(BIN_NAME)
 
 
 docs:
+	@echo "========= GENERATING DOCS ========="
 	doxygen
+	cd docs/html; tar -czf ../../$(DOCS_ARCH) ./*
+
+
+clean-docs:
+	@echo "========= CLEANING DOCS ========="
+	rm -fR docs/html
+
+
+upload-docs:
+	@$(MAKE) docs
+	scp $(DOCS_ARCH) jan@milik.cz:public_html/cppapp
+	ssh -t jan@milik.cz "cd ~/public_html/cppapp/docs; tar -xzf ../$(DOCS_ARCH)"
 
 
 clean:
