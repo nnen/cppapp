@@ -100,6 +100,33 @@ uint32_t littleEndianToHost(uint32_t value);
 
 int ceilDiv(int a, int b);
 
+template<class T>
+bool safeAdd(T a, T b, T *result)
+{
+	T c = a + b;
+	
+	if ((a > 0) && (b > 0) && (c <= 0)) {
+		return false;
+	}
+	if ((a < 0) && (b < 0) && (c >= 0)) {
+		return false;
+	}
+	
+	*result = c;
+	return true;
+}
+
+#ifdef NDEBUG
+#	define DEBUG_ADD(a, b, c) { \
+		{ *(c) = (a) + (b); } \
+		}
+#else
+#	define DEBUG_ADD(a, b, c) { \
+		if (!safeAdd((a), (b), (c))) { \
+			LOG_WARNING("Addition overflow: *(" #c ") = (" #a ") + (" #b ")!"); \
+		}
+#endif
+
 
 template<class T>
 int getBits(T value)
