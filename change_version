@@ -1,0 +1,102 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+"""change_version module.
+
+Author: Jan Milík <milikjan@fit.cvut.cz>
+"""
+
+
+FILES = [
+    ("configure.ac",
+     r"(AC_INIT\s*\(\[[^\]]*\]\s*,\s*)\[[^\]]*\]",
+     r"\g<1>[{major}.{minor}{rev}]", ),
+    
+    ("Makefile.simple",
+     r"(VERSION\s*=\s*).*",
+     r"\g<1>{major}.{minor}{rev}", ),
+    
+    ("Doxyfile",
+     r"(PROJECT_NUMBER\s*=\s*).*",
+     r"\g<1>{major}.{minor}{rev}", ),
+]
+
+
+import re
+import sys
+import os
+import os.path as path
+import shutil
+import traceback
+import datetime
+import tempfile
+
+
+def replace_file(file_name, target_file, pattern, replacement):
+    print replacement
+    with open(file_name, "r") as f:
+        result = re.sub(pattern, replacement, f.read(), re.MULTILINE)
+    
+    with open(target_file, "w") as f:
+        f.write(result)
+
+
+def configure_files(files, directory, values):
+    tmp_files = []
+    
+    try:
+        for file_name, pattern, replacement in files:
+            file_name = path.join(directory, file_name)
+            
+            handle, tmp_file  = tempfile.mkstemp()
+            tmp_files.append((file_name, tmp_file, ))
+            os.close(handle)
+            
+            sys.stderr.write("Configuring %s...\n" % (file_name, ))
+            replace_file(file_name, tmp_file, pattern, replacement.format(**values))
+        
+        sys.stderr.write("Moving temporary files...\n")
+        for file_name, tmp_file in tmp_files:
+            shutil.copyfile(file_name, "%s.bak" % (file_name, ))
+            shutil.move(tmp_file, file_name)
+    except Exception, e:
+        try:
+            report_name = "change_version.{0}.error_log".format(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
+            with open(report_name, "w") as f:
+                f.write("ARGS: %r\n" % (sys.argv, ))
+                f.write("FILES: %r\n" % (files, ))
+                f.write("DIRECTORY: %r\n\n" % (directory, ))
+                f.write("EXCEPTION:\n")
+                traceback.print_exc(file = f)
+            sys.stderr.write("ERROR: Unexpected error happened while configuring files. Error report written to {0}.\n".format(report_name))
+        except Exception, e2:
+            sys.stderr.write("ERROR: Unexpected error happened while "
+                             "configuring files. Could not write error report "
+                             "because of different error (ironically).\n")
+    
+    sys.stderr.write("Done.\n")
+
+
+def get_arg(index, default = ""):
+    if len(sys.argv) <= index:
+        return default
+    return sys.argv[index]
+
+
+def main():
+    major = get_arg(1)
+    minor = get_arg(2)
+    rev   = get_arg(3)
+    
+    sys.stderr.write("VERSION: {major}.{minor}{rev}".format(major = major, minor = minor, rev = rev))
+    
+    directory = path.dirname(path.abspath(sys.argv[0]))
+    configure_files(FILES, directory, {
+        "major": major,
+        "minor": minor,
+        "rev":   rev,
+    })
+
+
+if __name__ == "__main__":
+    main()
+
