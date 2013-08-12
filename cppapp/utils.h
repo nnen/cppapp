@@ -117,14 +117,19 @@ bool safeAdd(T a, T b, T *result)
 }
 
 #ifdef NDEBUG
-#	define DEBUG_ADD(a, b, c) { \
-		{ *(c) = (a) + (b); } \
-		}
+#	define DEBUG_ADD(a, b, c) { *(c) = (a) + (b); }
+#	define DEBUG_ASSIGN_ADD(c, a, b) { c = (a) + (b); }
 #else
 #	define DEBUG_ADD(a, b, c) { \
-		if (!safeAdd((a), (b), (c))) { \
+		if (!cppapp::safeAdd((a), (b), (c))) { \
 			LOG_WARNING("Addition overflow: *(" #c ") = (" #a ") + (" #b ")!"); \
-		}
+		} \
+	}
+#	define DEBUG_ASSIGN_ADD(c, a, b) { \
+		typeof(c) tmp; \
+		DEBUG_ADD(a, b, &tmp); \
+		c = tmp; \
+	}
 #endif
 
 

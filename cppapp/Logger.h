@@ -19,17 +19,17 @@
 #	define LOG_EXPR(expr)
 #else // LOG_DISABLE
 #	define LOG_ERROR(message__) { \
-		Logger::error() << Logger::Entry(__FILE__, __LINE__) << \
+		cppapp::Logger::error() << cppapp::Logger::Entry(__FILE__, __LINE__) << \
 		message__ << flush << endl; }
 #	define LOG_WARNING(message__) { \
-		Logger::warning() << Logger::Entry(__FILE__, __LINE__) << \
+		cppapp::Logger::warning() << cppapp::Logger::Entry(__FILE__, __LINE__) << \
 		message__ << flush << endl; }
 #	define LOG_INFO(message__) { \
-		Logger::info() << Logger::Entry(__FILE__, __LINE__) << \
+		cppapp::Logger::info() << cppapp::Logger::Entry(__FILE__, __LINE__) << \
 		message__ << flush << endl; }
 #	ifndef NDEBUG
 #		define LOG_DEBUG(message__) { \
-			Logger::debug() << Logger::Entry(__FILE__, __LINE__) << \
+			cppapp::Logger::debug() << cppapp::Logger::Entry(__FILE__, __LINE__) << \
 			message__ << flush << endl; }
 #		define LOG_ASSERTION(expr) { \
 			if (!(expr)) LOG_ERROR("Assertion \"" #expr "\" failed!"); \
