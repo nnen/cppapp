@@ -20,6 +20,7 @@
 #include "Logger.h"
 
 
+#define CPPAPP_CONFIG_FILE_CFG_KEY "config_file"
 #define CPPAPP_OUTPUT_FILE_CFG_KEY "output_file"
 
 
