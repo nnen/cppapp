@@ -47,6 +47,17 @@ namespace cppapp {
 #define IN_RANGE(it_name, size_expr) \
 	for (int it_name = 0; it_name < (int)(size_expr); it_name++)
 
+/**
+ * \brief Iterates over STL-like container. 
+ *
+ * \code{.cpp}
+ * vector<int> numbers;
+ *
+ * FOR_EACH(numbers, it) {
+ * 	std::cout << "The number is: " << *it << std::endl;
+ * }
+ * \endcode
+ */
 #define FOR_EACH(collection, it_name) for ( \
 	VAR(it_name, (collection).begin()); \
 	it_name != (collection).end(); \
@@ -58,6 +69,18 @@ namespace cppapp {
 	     it_name != end_name;                   \
 	     it_name++)
 
+/**
+ * \brief Iterates over STL-like container and increment a counter.
+ *
+ * \code{.cpp}
+ * vector<int> numbers;
+ * int         index;
+ *
+ * FOR_EACH_ENUM(numbers, it, index) {
+ * 	std::cout << index << ". number is: " << *it << std::endl;
+ * }
+ * \endcode
+ */
 #define FOR_EACH_ENUM(collection, it_name, enum_name) \
 	for( \
 		VAR(it_name, (collection).begin()); \

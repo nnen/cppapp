@@ -19,6 +19,11 @@ using namespace std;
 namespace cppapp {
 
 
+/** \addtogroup threading
+ * @{
+ */
+
+
 /**
  * \todo Write documentation for class Thread.
  */
@@ -85,6 +90,9 @@ public:
 	
 	TReturn* returnValue() const { return returnValue_; }
 };
+
+
+/** @} */
 
 
 } // namespace cppapp
