@@ -19,6 +19,11 @@
 namespace cppapp {
 
 
+/** \addtogroup threading
+ * @{
+ */
+
+
 class Mutex;
 class Condition;
 
@@ -138,17 +143,25 @@ public:
 	{
 		HANDLE_SYSERR(pthread_cond_destroy(&cond_));
 	}
-
+	
 	void wait(Mutex &mutex)
 	{
 		HANDLE_SYSERR(pthread_cond_wait(&cond_, &mutex.mutex_));
 	}
-
+	
 	void signal()
 	{
 		HANDLE_SYSERR(pthread_cond_signal(&cond_));
 	}
+
+	void broadcast()
+	{
+		HANDLE_SYSERR(pthread_cond_broadcast(&cond_));
+	}
 };
+
+
+/** @} */
 
 
 } /* namespace cppapp */
