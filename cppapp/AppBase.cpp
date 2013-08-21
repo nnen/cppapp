@@ -40,6 +40,11 @@ void AppBase::printUsage(std::ostream& out)
  */
 void AppBase::setUp()
 {
+	options().add('c',
+			    "-",
+			    "CONFIG_FILE",
+			    CPPAPP_CONFIG_FILE_CFG_KEY,
+			    "Use the specified config file instead of the default.");
 	options().add('o',
 			    "-",
 			    "OUTPUT_FILE",
@@ -95,9 +100,9 @@ int AppBase::run(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 	
-	string configFileName = config_->get("config_file",
+	string configFileName = config_->get(CPPAPP_CONFIG_FILE_CFG_KEY,
 								  getDefaultConfigFile())->asString();
-	LOG_EXPR(configFileName);
+	
 	Ref<FileInput> configInput = new FileInput(configFileName);
 	if (configInput->exists()) {
 		ConfigParser parser(config_);
