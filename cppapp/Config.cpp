@@ -264,7 +264,7 @@ ConfigParser::ConfigParser(Ref<Config> config) :
 void ConfigParser::parse(Ref<Input> input)
 {
 	input_ = input;
-	loc_ = TextLoc();
+	loc_ = TextLoc2();
 	error_ = false;
 	key_ = "";
 	value_ = "";

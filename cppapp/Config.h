@@ -85,19 +85,19 @@ public:
 };
 
 
-struct TextLoc {
+struct TextLoc2 {
 	int line;
 	int column;
 
-	TextLoc() :
+	TextLoc2() :
 		line(1), column(1)
 	{ }
 	
-	TextLoc(int line, int column) :
+	TextLoc2(int line, int column) :
 		line(line), column(column)
 	{ }
 	
-	TextLoc newline() { return TextLoc(line + 1, 1); }
+	TextLoc2 newline() { return TextLoc2(line + 1, 1); }
 
 	void operator++(int dummy)
 	{
@@ -112,7 +112,7 @@ private:
 	
 	Ref<Input> input_;
 	
-	TextLoc loc_;
+	TextLoc2 loc_;
 	bool error_;
 	string key_;
 	string value_;

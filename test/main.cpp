@@ -6,6 +6,7 @@ using namespace std;
 using namespace cppapp;
 
 #include "ObjectTest.h"
+#include "JSONTest.h"
 
 
 class BacktraceTest : public TestCase {

@@ -14,6 +14,7 @@
 #include "Config.h"
 #include "Exception.h"
 #include "Input.h"
+#include "Lexer.h"
 #include "Logger.h"
 #include "Mutex.h"
 #include "Object.h"
@@ -24,6 +25,7 @@
 #include "Test.h"
 #include "TestApp.h"
 #include "string_utils.h"
+#include "json.h"
 #include "utils.h"
 
 #endif /* end of include guard: CPPAPP_XKJCG2SU */
