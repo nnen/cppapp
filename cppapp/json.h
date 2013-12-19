@@ -58,12 +58,15 @@ public:
 	
 	virtual int getSize() const { return 0; }
 	
-	virtual bool            hasItem(Ref<JSONObject> key) { return false; }
-	virtual Ref<JSONObject> getItem(std::string key);
+	virtual bool            hasItem(std::string key) { return false; }
+	virtual bool            hasItem(int index)       { return false; }
+	virtual Ref<JSONObject> getItem(std::string key, Ref<JSONObject> deflt);
+	virtual Ref<JSONObject> getItem(std::string key) { return getItem(key, NULL); }
 	virtual Ref<JSONObject> getItem(int key);
 	virtual void            setItem(std::string key, Ref<JSONObject> value);
-	virtual void            setItem(int key, Ref<JSONObject> value);
+	virtual void            setItem(int key, Ref<JSONObject> value) {}
 	
+	virtual bool            hasItem(Ref<JSONObject> key);
 	virtual Ref<JSONObject> getItem(Ref<JSONObject> key);
 	virtual void            setItem(Ref<JSONObject> key, Ref<JSONObject> value);
 	
@@ -73,10 +76,10 @@ public:
 	virtual Ref<JSONNumber>  toNum();
 	virtual Ref<JSONString>  toString();
 	
-	virtual bool        getBool() const;
-	virtual int         getInt() const;
-	virtual double      getDouble() const;
-	virtual std::string getString() const;
+	virtual bool        getBool() const   { return true; }
+	virtual double      getDouble() const { return 0; }
+	virtual int         getInt() const    { return (int)getDouble(); }
+	virtual std::string getString() const { return "JSONObject"; }
 };
 
 
@@ -86,8 +89,11 @@ class JSONString;
 
 
 class JSONDict : public JSONObject {
+public:
+	typedef std::map<std::string, Ref<JSONObject> > Map;
+
 private:
-	std::map<std::string, Ref<JSONObject> > _values;
+	Map _values;
 
 public:
 	JSONDict(TextLoc loc) :
@@ -97,12 +103,24 @@ public:
 	virtual ~JSONDict() { _values.clear(); }
 	
 	virtual bool isDict() const { return true; }
-
-	int getSize() { return _values.size(); }
-
-	void set(Ref<JSONString> key, Ref<JSONObject> value);
-	bool hasKey(Ref<JSONString> key);
-	Ref<JSONObject> get(Ref<JSONString> key, Ref<JSONObject> deflt);
+	
+	virtual int getSize() const { return _values.size(); }
+	
+	virtual bool hasItem(std::string key);
+	virtual Ref<JSONObject> getItem(std::string key, Ref<JSONObject> deflt);
+	virtual void setItem(std::string key, Ref<JSONObject> value);
+	
+	void update(Ref<JSONDict> dict)
+	{
+		FOR_EACH(*dict, it) {
+			setItem(it->first, it->second);
+		}
+	}
+	
+	Map::iterator begin() { return _values.begin(); }
+	Map::iterator end()   { return _values.end(); }
+	Map::const_iterator begin() const { return _values.begin(); }
+	Map::const_iterator end()   const { return _values.end(); }
 };
 
 
@@ -121,7 +139,7 @@ public:
 	
 	virtual bool isList() const { return true; }
 	
-	int getSize() { return _values.size(); }
+	virtual int getSize() const { return _values.size(); }
 	
 	void append(Ref<JSONObject> obj) { _values.push_back(obj); }
 	Ref<JSONObject> get(int index);
@@ -152,8 +170,17 @@ public:
 	JSONBoolean(TextLoc loc, bool value) :
 		JSONScalar(loc, value)
 	{}
-
+	
 	virtual bool isBool() const { return true; }
+	
+	virtual Ref<JSONBoolean> toBool() { return this; }
+	
+	virtual bool        getBool()   const { return getValue(); }
+	virtual double      getDouble() const { return getValue() ? 1 : 0; }
+	virtual std::string getString() const { return getValue() ? "true" : "false"; }
+	
+	static bool parse(Lexer *lexer, bool *result);
+	static bool parse(std::string str, bool *result);
 };
 
 
@@ -166,6 +193,19 @@ public:
 	{}
 	
 	virtual bool isNum() const { return true; }
+
+	virtual Ref<JSONNumber> toNum() { return this; }
+
+	virtual bool   getBool()   const { return getValue() != 0.0; }
+	virtual double getDouble() const { return getValue(); }
+	virtual std::string getString() const {
+		std::ostringstream out;
+		out << getValue();
+		return out.str();
+	}
+	
+	static bool parse(Lexer *lexer, double *result);
+	static bool parse(std::string str, double *result);
 };
 
 
@@ -178,6 +218,12 @@ public:
 	{}
 	
 	virtual bool isString() const { return true; }
+	
+	virtual Ref<JSONString> toString() { return this; }
+	
+	virtual bool getBool() const;
+	virtual double getDouble() const;
+	virtual std::string getString() const { return getValue(); }
 };
 
 
@@ -186,6 +232,10 @@ public:
 class JSONNull : public JSONObject {
 public:
 	virtual bool isNull() const { return true; }
+	
+	virtual bool getBool() const { return false; }
+	virtual double getDouble() const { return 0.0; }
+	virtual std::string getString() const { return "null"; }
 	
 	static Ref<JSONNull> getInstance();
 };
@@ -204,9 +254,23 @@ public:
 	{}
 	
 	virtual bool isError() const { return true; }
-
-	virtual Ref<JSONString> toString();
+	
+	virtual bool getBool() const { return false; }
+	virtual std::string getString() const
+	{
+		std::ostringstream out;
+		out << message_;
+		out << " (" << getLocation().fileName << ":" << getLocation().line << ")";
+		return out.str();
+	}
 };
+
+
+#define JSON_MAKE_ERROR(msg) new JSONError( \
+	TextLoc(__FILE__, __LINE__),      \
+	(msg),                            \
+	TextLoc(__FILE__, __LINE__)       \
+);
 
 
 //// JSONParser /////////////////////////////////////////////////////
@@ -229,6 +293,9 @@ private:
 
 public:
 	Ref<JSONObject> parse(std::istream *input, std::string fileName);
+	
+	static bool strToBool(Lexer *lexer, double *result);
+	static bool strToDouble(Lexer *lexer, double *result);
 };
 
 

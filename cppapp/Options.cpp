@@ -51,6 +51,8 @@ void Options::add(char        option,
 						metavar,
 						configKey,
 						description);
+	
+	configKeys[configKey] = option;
 }
 
 
@@ -118,6 +120,12 @@ void Options::parse(int argc, char *argv[])
 Option& Options::get(int opt)
 {
 	return options[opt];
+}
+
+
+Option& Options::get(string configKey)
+{
+	return get(configKeys[configKey]);
 }
 
 

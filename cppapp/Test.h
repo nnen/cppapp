@@ -112,10 +112,17 @@ public:
 class TestRef : public Object {
 protected:
 	std::string name_;
+	bool        expectFailure_;
 public:
-	TestRef(const std::string& name) : name_(name) {}
+	TestRef(const std::string& name, bool expectFailure) :
+		name_(name),
+		expectFailure_(expectFailure)
+	{}
 	
 	std::string getName() const { return name_; }
+	bool getExpectFailure() const { return expectFailure_; }
+	void setExpectFailure(bool value) { expectFailure_ = value; }
+	
 	virtual Ref<TestCase> getTestCase() = 0;
 	
 	virtual void setUp() = 0;
@@ -137,8 +144,8 @@ public:
 	//TestRef_(const char *name) : TestRef(name), instance_(NULL), method_(NULL)
 	//{ }
 	
-	TestRef_(const std::string& name, Ref<T> instance, void (T::*method)()) :
-		TestRef(name), instance_(instance), method_(method)
+	TestRef_(const std::string& name, Ref<T> instance, void (T::*method)(), bool expectFailure) :
+		TestRef(name, expectFailure), instance_(instance), method_(method)
 	{ }
 	
 	virtual Ref<TestCase> getTestCase() { return instance_; }
@@ -170,6 +177,9 @@ public:
 struct TestResult {
 	bool          success;
 	bool          exception;
+
+	bool          expectedFailure;
+	bool          expectedException;
 	
 	bool          hasLocation;
 	const char   *file;
@@ -182,12 +192,14 @@ struct TestResult {
 	
 	TestResult() :
 		success(true), exception(false),
+		expectedFailure(false), expectedException(false),
 		hasLocation(false), file(""), line(0),
 		assertion(""), message("")
 	{}
 	
 	TestResult(bool success, const char *file, int line) :
 		success(success), exception(false),
+		expectedFailure(false), expectedException(false),
 		hasLocation(true), file(file), line(line),
 		assertion(""), message("")
 	{}
@@ -195,6 +207,7 @@ struct TestResult {
 	TestResult(bool success, const char *file, int line,
 			 const char *assertion, const char *message) :
 		success(success), exception(false),
+		expectedFailure(false), expectedException(false),
 		hasLocation(true), file(file), line(line),
 		assertion(assertion == NULL ? "" : assertion), message(message)
 	{}
@@ -202,6 +215,7 @@ struct TestResult {
 	TestResult(bool success, const char *file, int line,
 			 std::string assertion, const char *message) :
 		success(success), exception(false),
+		expectedFailure(false), expectedException(false),
 		hasLocation(true), file(file), line(line),
 		assertion(assertion), message(message)
 	{}
@@ -301,7 +315,8 @@ struct TestSuiteRegistration {
 ////////////////////////////////////////////////////////////////////////////////
 
 
-#define TEST_ADD(testCase, method) registerTest(&testCase::method, #method, #testCase);
+#define TEST_ADD(testCase, method) registerTest(&testCase::method, #method, #testCase, false);
+#define TEST_ADD2(testCase, method, expectFailure) registerTest(&testCase::method, #method, #testCase, expectFailure);
 
 #define TEST_ASSERT(expr, message) \
 	assert_((expr), __FILE__, __LINE__, #expr, message);
@@ -327,14 +342,14 @@ protected:
 	{}
 	
 	template<class T>
-	void registerTest(void (T::*method)(), std::string name, std::string caseName)
+	void registerTest(void (T::*method)(), std::string name, std::string caseName, bool expectFailure)
 	{
 		// Set the name of this test case.
 		//name_.assign(name, 0, colonPos);
 		setName(caseName);
 		
 		// Add the test to the list of this test case's test list.
-		add(new TestRef_<T>(name, (T*)this, method));
+		add(new TestRef_<T>(name, (T*)this, method, expectFailure));
 	}
 	
 	void assert_(bool value,
@@ -345,7 +360,7 @@ public:
 	virtual void setUp() {}
 	virtual void tearDown() {}
 	
-	void reset();
+	virtual void reset();
 };
 
 
@@ -358,6 +373,8 @@ class TestRunner {
 private:
 	int testCount_;
 	int failureCount_;
+	int exceptionCount_;
+	int expectedFailureCount_;
 	
 protected:
 	virtual void startTests(const TestSuite &tests) {}
@@ -373,6 +390,8 @@ protected:
 public:
 	int getTestCount() const { return testCount_; }
 	int getFailureCount() const { return failureCount_; }
+	int getExceptionCount() const { return exceptionCount_; }
+	int getExpectedFailureCount() const { return expectedFailureCount_; }
 	
 	virtual void run(const TestSuite &tests);
 	virtual void debug(const TestSuite &tests);

@@ -20,15 +20,15 @@ namespace cppapp {
 ////////////////////////////////////////////////////////////////////////////////
 
 
-Ref<JSONObject> JSONObject::getItem(std::string key)
+Ref<JSONObject> JSONObject::getItem(std::string key, Ref<JSONObject> deflt)
 {
-	return getItem(new JSONString(TextLoc(), key));
+	return JSON_MAKE_ERROR("Key error.");
 }
 
 
 Ref<JSONObject> JSONObject::getItem(int key)
 {
-	return getItem(new JSONNumber(TextLoc(), key));
+	return JSON_MAKE_ERROR("Index error.");
 }
 
 
@@ -37,14 +37,27 @@ void JSONObject::setItem(std::string key, Ref<JSONObject> value)
 }
 
 
-void JSONObject::setItem(int key, Ref<JSONObject> value)
+bool JSONObject::hasItem(Ref<JSONObject> key)
 {
+	if (key->isString()) {
+		return hasItem(key->getString());
+	} else if (key->isNum()) {
+		return hasItem(key->getInt());
+	}
+	
+	return false;
 }
 
 
 Ref<JSONObject> JSONObject::getItem(Ref<JSONObject> key)
 {
-	return JSONNull::getInstance();
+	if (key->isString()) {
+		return getItem(key->getString());
+	} else if (key->isNum()) {
+		return getItem(key->getInt());
+	}
+	
+	return JSON_MAKE_ERROR("Key error.");
 }
 
 
@@ -68,19 +81,19 @@ bool JSONObject::equals(Ref<JSONObject> other) const
 
 Ref<JSONBoolean> JSONObject::toBool()
 {
-	return new JSONBoolean(getLocation(), true);
+	return new JSONBoolean(getLocation(), getBool());
 }
 
 
 Ref<JSONNumber> JSONObject::toNum()
 {
-	return new JSONNumber(getLocation(), 0);
+	return new JSONNumber(getLocation(), getDouble());
 }
 
 
 Ref<JSONString> JSONObject::toString()
 {
-	return new JSONString(getLocation(), "JSONObject");
+	return new JSONString(getLocation(), getString());
 }
 
 
@@ -89,28 +102,28 @@ Ref<JSONString> JSONObject::toString()
 ////////////////////////////////////////////////////////////////////////////////
 
 
-void JSONDict::set(Ref<JSONString> key, Ref<JSONObject> value)
+bool JSONDict::hasItem(std::string key)
 {
-	_values[key->getValue()] = value;
-}
-
-
-bool JSONDict::hasKey(Ref<JSONString> key)
-{
-	VAR(found, _values.find(key->getValue()));
+	VAR(found, _values.find(key));
 	if (found == _values.end())
 		return false;
 	return true;
 }
 
 
-Ref<JSONObject> JSONDict::get(Ref<JSONString> key, Ref<JSONObject> deflt)
+Ref<JSONObject> JSONDict::getItem(std::string key, Ref<JSONObject> deflt)
 {
-	VAR(found, _values.find(key->getValue()));
+	VAR(found, _values.find(key));
 	if (found == _values.end()) {
 		return deflt;
 	}
 	return found->second;
+}
+
+
+void JSONDict::setItem(std::string key, Ref<JSONObject> value)
+{
+	_values[key] = value;
 }
 
 
@@ -126,6 +139,110 @@ Ref<JSONObject> JSONList::get(int index)
 	}
 	
 	return _values[index];
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// JSONBoolean class
+////////////////////////////////////////////////////////////////////////////////
+
+
+bool JSONBoolean::parse(Lexer *lexer, bool *result)
+{
+	lexer->skipWhitespace();
+	
+	if (lexer->read("true") || lexer->read("True")) {
+		*result = true;
+		return true;
+	} else if (lexer->read("false") || lexer->read("False")) {
+		*result = false;
+		return true;
+	}
+	
+	return false;
+}
+
+
+bool JSONBoolean::parse(std::string str, bool *result)
+{
+	std::istringstream in(str);
+	Lexer lexer;
+	lexer.input(&in, "<string>");
+	
+	if (!parse(&lexer, result))
+		return false;
+	
+	lexer.skipWhitespace();
+	return (lexer.peek() < 0);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// JSONNumber class
+////////////////////////////////////////////////////////////////////////////////
+
+
+bool JSONNumber::parse(Lexer *lexer, double *result)
+{
+	*result = 0.0;
+	
+	lexer->skipWhitespace();
+	
+	if (!isdigit(lexer->peek()))
+		return false;
+	
+	while (isdigit(lexer->peek())) {
+		*result *= 10.0;
+		*result += (double)(lexer->read() - '0');
+	}
+	
+	if (lexer->read('.')) {
+		double place = 0.1;
+		
+		while (isdigit(lexer->peek())) {
+			*result += (double)(lexer->read() - '0') * place;
+			place *= 0.1;
+		}
+	}
+	
+	return true;
+}
+
+
+bool JSONNumber::parse(std::string str, double *result)
+{
+	std::istringstream in(str);
+	Lexer lexer;
+	lexer.input(&in, "<string>");
+	
+	if (!parse(&lexer, result))
+		return false;
+	
+	lexer.skipWhitespace();
+	return (lexer.peek() < 0);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// JSONString class
+////////////////////////////////////////////////////////////////////////////////
+
+
+bool JSONString::getBool() const
+{
+	bool result;
+	if (JSONBoolean::parse(getValue(), &result))
+		return result;
+	return true;
+}
+
+
+double JSONString::getDouble() const
+{
+	double result;
+	if (JSONNumber::parse(getValue(), &result))
+		return result;
+	return 0.0;
 }
 
 
@@ -148,15 +265,6 @@ Ref<JSONNull> JSONNull::getInstance()
 ////////////////////////////////////////////////////////////////////////////////
 // JSONError class
 ////////////////////////////////////////////////////////////////////////////////
-
-
-Ref<JSONString> JSONError::toString()
-{
-	std::ostringstream ss;
-	ss << message_;
-	ss << " (" << getLocation().fileName << ":" << getLocation().line << ")";
-	return new JSONString(TextLoc(), ss.str());
-}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -184,6 +292,8 @@ Ref<JSONError> JSONParser::returnError(const char *fn, int line)
 
 bool JSONParser::readObject(Ref<JSONObject> *result)
 {
+	lexer.skipWhitespace();
+	
 	if (readDict(result))
 		return true;
 	
@@ -210,7 +320,7 @@ bool JSONParser::readDict(Ref<JSONObject> *result)
 	
 	Ref<JSONString> key;
 	Ref<JSONObject> value;
-	Ref<JSONDict>   dict = new JSONDict(lexer.getLocation());
+	Ref<JSONObject> dict = new JSONDict(lexer.getLocation());
 	*result = dict;
 	
 	while(lexer.read(','));
@@ -226,7 +336,7 @@ bool JSONParser::readDict(Ref<JSONObject> *result)
 			return true;
 		}
 		
-		dict->set(key, value);
+		dict->setItem(key, value);
 		
 		if (!lexer.read(','))
 			break;
@@ -355,21 +465,9 @@ bool JSONParser::readNumber(Ref<JSONObject> *result)
 		return false;
 	
 	TextLoc loc = lexer.getLocation();
-	double value = 0.0;
 	
-	while (isdigit(lexer.peek())) {
-		value *= 10.0;
-		value += (double)(lexer.read() - '0');
-	}
-
-	if (lexer.read('.')) {
-		double place = 0.1;
-		
-		while (isdigit(lexer.peek())) {
-			value += (double)(lexer.read() - '0') * place;
-			place *= 0.1;
-		}
-	}
+	double value = 0.0;
+	JSONNumber::parse(&lexer, &value);
 	
 	*result = new JSONNumber(loc, value);
 	return true;
@@ -380,15 +478,12 @@ bool JSONParser::readBool(Ref<JSONObject> *result)
 {
 	TextLoc loc = lexer.getLocation();
 	
-	if (lexer.read("true") || lexer.read("True")) {
-		*result = new JSONBoolean(loc, true);
-		return true;
-	} else if (lexer.read("false") || lexer.read("False")) {
-		*result = new JSONBoolean(loc, false);
-		return true;
-	}
+	bool value;
+	if (!JSONBoolean::parse(&lexer, &value))
+		return false;
 	
-	return false;
+	*result = new JSONBoolean(loc, value);
+	return true;
 }
 
 

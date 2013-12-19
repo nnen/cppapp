@@ -36,6 +36,8 @@ TestResult TestRef::run()
 		result = TestResult(false, "", 0, "", "unknown exception");
 	}
 	
+	result.expectedFailure = getExpectFailure();
+	
 	tearDown();
 	
 	return result;
@@ -64,6 +66,7 @@ TestResult TestRef::debug()
  */
 TestResult::TestResult(std::exception &e) :
 	success(false), exception(true),
+	expectedFailure(false), expectedException(false),
 	hasLocation(false), file(""), line(0),
 	assertion(""), message(e.what())
 { }
@@ -75,6 +78,7 @@ TestResult::TestResult(std::exception &e) :
 TestResult::TestResult(std::exception &e,
 				   const TestBacktrace &backtrace) :
 	success(false), exception(true),
+	expectedFailure(false), expectedException(false),
 	hasLocation(false), file(""), line(0),
 	assertion(""), message(e.what()),
 	backtrace(backtrace)
@@ -186,6 +190,8 @@ void TestRunner::run(const TestSuite &tests)
 {
 	testCount_ = 0;
 	failureCount_ = 0;
+	exceptionCount_ = 0;
+	expectedFailureCount_ = 0;
 	
 	startTests(tests);
 	
@@ -193,7 +199,14 @@ void TestRunner::run(const TestSuite &tests)
 		startTest(*test);
 		
 		TestResult result = (*test)->run();
-		if (!result.success) failureCount_++;
+		if (!result.success) {
+			if (result.expectedFailure)
+				expectedFailureCount_++;
+			else if (result.exception)
+				exceptionCount_++;
+			else
+				failureCount_++;
+		}
 		
 		addTestResult(*test, result);
 		
@@ -239,9 +252,21 @@ void TextTestRunner::finishTests(const TestSuite &tests)
 	*output_ << "\033[1m" << getTestCount() << " tests run, ";
 	
 	if (getFailureCount() == 0)
-		*output_ << getFailureCount() << " failures." << std::endl;
+		*output_ << getFailureCount() << " failures, ";
 	else
-		*output_ << "\033[1;31m" << getFailureCount() << " failures\033[0m." << std::endl;
+		*output_ << "\033[1;31m" << getFailureCount() << " failure(s)\033[0m, ";
+	
+	if (getExceptionCount() == 0)
+		*output_ << getExceptionCount() << " exceptions";
+	else
+		*output_ << "\033[1;33m" << getExceptionCount() << " exception(s)\033[0m";
+	
+	if (getExpectedFailureCount() == 0) {
+		*output_ << "." << std::endl;
+	} else {
+		*output_ << ", ";
+		*output_ << getExpectedFailureCount() << " expected failure(s)." << std::endl;
+	}
 }
 
 
@@ -254,10 +279,25 @@ void TextTestRunner::startTest(Ref<TestRef> test)
 
 void TextTestRunner::addTestResult(Ref<TestRef> test, TestResult result)
 {
-	if (result.exception)
-		*output_ << (result.success ? "OK" : "\033[1;33mEXCEPTION\033[0m") << std::flush;
-	else
-		*output_ << (result.success ? "OK" : "\033[1;31mFAILURE\033[0m") << std::flush;
+	if (result.success) {
+		*output_ << "OK" << std::flush;
+	} else if (result.expectedFailure) {
+		if (result.exception)
+			*output_ << "EXCEPTION";
+		else
+			*output_ << "FAILURE";
+		*output_ << " (expected)";
+	} else {
+		if (result.exception)
+			*output_ << "\033[1;33mEXCEPTION\033[0m" << std::flush;
+		else
+			*output_ << "\033[1;31mFAILURE\033[0m" << std::flush;
+	}
+	
+	//if (result.exception)
+	//	*output_ << (result.success ? "OK" : "\033[1;33mEXCEPTION\033[0m") << std::flush;
+	//else
+	//	*output_ << (result.success ? "OK" : "\033[1;31mFAILURE\033[0m") << std::flush;
 	*output_ << std::endl << std::flush;
 	
 	if (result.exception) {
@@ -303,12 +343,12 @@ void TextTestRunner::startTestDebug(Ref<TestRef> test)
 TestTestCase::TestTestCase() :
 	TestCase()
 {
-	TEST_ADD(TestTestCase, noFailureTest);
-	TEST_ADD(TestTestCase, unconditionalFailureTest);
-	TEST_ADD(TestTestCase, simpleFailureTest);
-	TEST_ADD(TestTestCase, exceptionFailureTest);
-	TEST_ADD(TestTestCase, equalsAssertionTest);
-	TEST_ADD(TestTestCase, equalsAssertionFailureTest);
+	TEST_ADD (TestTestCase, noFailureTest);
+	TEST_ADD2(TestTestCase, unconditionalFailureTest, true);
+	TEST_ADD2(TestTestCase, simpleFailureTest, true);
+	TEST_ADD2(TestTestCase, exceptionFailureTest, true);
+	TEST_ADD (TestTestCase, equalsAssertionTest);
+	TEST_ADD2(TestTestCase, equalsAssertionFailureTest, true);
 }
 
 

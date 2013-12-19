@@ -16,38 +16,10 @@
 #include <string>
 #include <vector>
 
+#include "TextLoc.h"
+
 
 namespace cppapp {
-
-
-struct TextLoc {
-	std::string fileName;
-	int         line;
-	int         column;
-	
-	TextLoc() :
-		fileName(), line(1), column(0)
-	{}
-	
-	TextLoc(std::string fileName) :
-		fileName(fileName), line(1), column(0)
-	{}
-	
-	TextLoc(std::string fileName, int line) :
-		fileName(fileName), line(line), column(0)
-	{}
-	
-	TextLoc(std::string fileName, int line, int column) :
-		fileName(fileName), line(line), column(column)
-	{}
-	
-	TextLoc newLine() { return TextLoc(fileName, line + 1, 0); }
-	
-	TextLoc operator+(int rhs)
-	{
-		return TextLoc(fileName, line, column + 1);
-	}
-};
 
 
 /**

@@ -34,7 +34,7 @@ bool Lexer::bufferChars(int length)
 	while ((int)buffer_.size() < length) {
 		if (!input_->good())
 			return false;
-
+		
 		int c = input_->get();
 		buffer_.push_back(c);
 	}
@@ -47,7 +47,7 @@ int Lexer::peek()
 {
 	if (!bufferChars(1))
 		return -1;
-
+	
 	return buffer_[0];
 }
 

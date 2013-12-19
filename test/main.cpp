@@ -7,6 +7,8 @@ using namespace cppapp;
 
 #include "ObjectTest.h"
 #include "JSONTest.h"
+#include "StringUtilsTest.h"
+#include "DynObjectTest.h"
 
 
 class BacktraceTest : public TestCase {

@@ -127,6 +127,7 @@ struct Option {
 class Options {
 public:
 	typedef map<int, Option> Map;
+	typedef map<std::string, int> ConfigMap;
 	typedef vector<string> Arguments;
 
 private:
@@ -140,6 +141,8 @@ private:
 	Arguments   arguments;
 	string      executable;
 	bool        valid;
+	
+	ConfigMap   configKeys;
 	
 	void error(string message);
 	
@@ -166,6 +169,7 @@ public:
 	void parse(int argc, char *argv[]);
 	
 	Option& get(int opt);
+	Option& get(std::string configKey);
 	
 	Arguments& args() { return arguments; } 
 	string     getExecutable() const { return executable; }

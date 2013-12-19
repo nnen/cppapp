@@ -11,6 +11,7 @@
 
 
 #include <string> 
+#include <vector> 
 #include <algorithm> 
 #include <functional> 
 #include <cctype>
@@ -49,6 +50,27 @@ static inline std::string toUpper(const std::string &s) {
 	std::transform(s.begin(), s.end(), result.begin(), ::toupper);
 	return result;
 }
+
+
+struct Strings {
+
+	static inline void split(std::string value, std::string separator, std::vector<std::string> *output) {
+		size_t pos = 0;
+		
+		while (pos < value.length()) {
+			size_t found = value.find(separator, pos);
+			
+			if (found == std::string::npos) {
+				output->push_back(value.substr(pos, value.length() - pos));
+				return;
+			}
+			
+			output->push_back(value.substr(pos, found - pos));
+			pos = found + separator.length();
+		}
+	}
+
+};
 
 
 #endif /* end of include guard: STRING_UTILS_GXVJSRP9 */

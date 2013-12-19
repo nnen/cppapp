@@ -99,6 +99,8 @@ int AppBase::run(int argc, char* argv[])
 		printUsage(std::cerr);
 		return EXIT_FAILURE;
 	}
+	if (options_.get(CPPAPP_CONFIG_FILE_CFG_KEY).isSet)
+		options_.get(CPPAPP_CONFIG_FILE_CFG_KEY).setConfigKey(config_);
 	
 	string configFileName = config_->get(CPPAPP_CONFIG_FILE_CFG_KEY,
 								  getDefaultConfigFile())->asString();
@@ -106,7 +108,7 @@ int AppBase::run(int argc, char* argv[])
 	Ref<FileInput> configInput = new FileInput(configFileName);
 	if (configInput->exists()) {
 		ConfigParser parser(config_);
-		parser.parse(new FileInput(configFileName));
+		parser.parse(configInput);
 		configInput->close();
 	} else {
 		LOG_WARNING("Configuration file " << configFileName << " does not exist.");
