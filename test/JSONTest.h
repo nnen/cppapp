@@ -53,31 +53,31 @@ public:
 	{
 		bool value;
 		
-		TEST_ASSERT(JSONBoolean::parse("true", &value), "failed to parse legal string");
+		TEST_ASSERT(DynBoolean::parse("true", &value), "failed to parse legal string");
 		TEST_EQUALS(true, value, "parsed the string, but returned invalid value");
 		
-		TEST_ASSERT(JSONBoolean::parse("True", &value), "failed to parse legal string");
+		TEST_ASSERT(DynBoolean::parse("True", &value), "failed to parse legal string");
 		TEST_EQUALS(true, value, "parsed the string, but returned invalid value");
 		
-		TEST_ASSERT(JSONBoolean::parse("false", &value), "failed to parse legal string");
+		TEST_ASSERT(DynBoolean::parse("false", &value), "failed to parse legal string");
 		TEST_EQUALS(false, value, "parsed the string, but returned invalid value");
 
-		TEST_ASSERT(JSONBoolean::parse("False", &value), "failed to parse legal string");
+		TEST_ASSERT(DynBoolean::parse("False", &value), "failed to parse legal string");
 		TEST_EQUALS(false, value, "parsed the string, but returned invalid value");
 		
-		TEST_ASSERT(!JSONBoolean::parse("xxx", &value), "parsed illegal string");
+		TEST_ASSERT(!DynBoolean::parse("xxx", &value), "parsed illegal string");
 	}
 	
 	void testGetMethods()
 	{
 		TextLoc loc;
 		
-		Ref<JSONBoolean> val = new JSONBoolean(loc, true);
+		Ref<DynBoolean> val = new DynBoolean(loc, true);
 		TEST_EQUALS(true, val->getBool(), "");
 		TEST_EQUALS(1.0, val->getDouble(), "");
 		TEST_EQUALS("true", val->getString(), "");
 		
-		val = new JSONBoolean(loc, false);
+		val = new DynBoolean(loc, false);
 		TEST_EQUALS(false, val->getBool(), "");
 		TEST_EQUALS(0.0, val->getDouble(), "");
 		TEST_EQUALS("false", val->getString(), "");
@@ -98,31 +98,31 @@ public:
 	{
 		double value;
 		
-		TEST_ASSERT(JSONNumber::parse("0", &value), "failed to parse legal string");
+		TEST_ASSERT(DynNumber::parse("0", &value), "failed to parse legal string");
 		TEST_EQUALS(0, value, "parsed the string, but returned invalid value");
 		
-		TEST_ASSERT(JSONNumber::parse("1", &value), "failed to parse legal string");
+		TEST_ASSERT(DynNumber::parse("1", &value), "failed to parse legal string");
 		TEST_EQUALS(1, value, "parsed the string, but returned invalid value");
 		
-		TEST_ASSERT(JSONNumber::parse("123", &value), "failed to parse legal string");
+		TEST_ASSERT(DynNumber::parse("123", &value), "failed to parse legal string");
 		TEST_EQUALS(123, value, "parsed the string, but returned invalid value");
 		
-		TEST_ASSERT(JSONNumber::parse("1.23", &value), "failed to parse legal string");
+		TEST_ASSERT(DynNumber::parse("1.23", &value), "failed to parse legal string");
 		TEST_EQUALS(1.23, value, "parsed the string, but returned invalid value");
 		
-		TEST_ASSERT(!JSONNumber::parse("xxx", &value), "failed to parse legal string");
+		TEST_ASSERT(!DynNumber::parse("xxx", &value), "failed to parse legal string");
 	}
 
 	void testGetMethods()
 	{
 		TextLoc loc;
 
-		Ref<JSONNumber> val = new JSONNumber(loc, 0);
+		Ref<DynNumber> val = new DynNumber(loc, 0);
 		TEST_EQUALS(false, val->getBool(), "");
 		TEST_EQUALS(0.0, val->getDouble(), "");
 		TEST_EQUALS("0", val->getString(), "");
 		
-		val = new JSONNumber(loc, 1);
+		val = new DynNumber(loc, 1);
 		TEST_EQUALS(true, val->getBool(), "");
 		TEST_EQUALS(1.0, val->getDouble(), "");
 		TEST_EQUALS("1", val->getString(), "");
@@ -144,6 +144,7 @@ public:
 	 */
 	JSONTest()
 	{
+		TEST_ADD(JSONTest, testParseComplex);
 		TEST_ADD(JSONTest, testParseEmptyDict);
 		TEST_ADD(JSONTest, testParseEmptyList);
 		TEST_ADD(JSONTest, testParseEmptyString);
@@ -152,12 +153,31 @@ public:
 		TEST_ADD(JSONTest, testParseDict);
 	}
 	
+	void testParseComplex()
+	{
+		istringstream iss(
+			"{\n"
+			"	\"first\": 1,\n"
+			"	\"second\": {},\n"
+			"	\"third\": {\n"
+			"		\"first\": [],"
+			"		\"second\": [1, 2],"
+			"		\"third\": [1, 2, 3, ],"
+			"	},\n"
+			"}\n"
+		);
+		JSONParser parser;
+		
+		Ref<DynObject> result = parser.parse(&iss, "<string>");
+		TEST_ASSERT(result->isDict(), "the result is not a DynDict");
+	}
+	
 	void testParseEmptyDict()
 	{
 		istringstream iss("{}");
 		JSONParser parser;
 		
-		Ref<JSONObject> result = parser.parse(&iss, "<string>");
+		Ref<DynObject> result = parser.parse(&iss, "<string>");
 		TEST_ASSERT(result->isDict(), "the result is not a JSONDict as expected");
 	}
 	
@@ -166,7 +186,7 @@ public:
 		istringstream iss("[]");
 		JSONParser parser;
 		
-		Ref<JSONObject> result = parser.parse(&iss, "<string>");
+		Ref<DynObject> result = parser.parse(&iss, "<string>");
 		TEST_ASSERT(result->isList(), "the result is not a JSONList as expected");
 	}
 
@@ -175,7 +195,7 @@ public:
 		istringstream iss("\"\"");
 		JSONParser parser;
 		
-		Ref<JSONObject> result = parser.parse(&iss, "<string>");
+		Ref<DynObject> result = parser.parse(&iss, "<string>");
 		TEST_ASSERT(result->isString(), "the result is not a JSONString as expected");
 	}
 	
@@ -184,9 +204,9 @@ public:
 		istringstream iss(json);
 		JSONParser parser;
 		
-		Ref<JSONObject> result = parser.parse(&iss, "<string>");
+		Ref<DynObject> result = parser.parse(&iss, "<string>");
 		TEST_ASSERT(result->isNum(), "the result is not a JSONNumber as expected");
-		Ref<JSONNumber> number = result;
+		Ref<DynNumber> number = result;
 		TEST_EQUALS(value, number->getValue(), "the value of the json number is not 0 as expected");
 	}
 	
@@ -204,9 +224,9 @@ public:
 		istringstream iss(json);
 		JSONParser parser;
 		
-		Ref<JSONObject> result = parser.parse(&iss, "<string>");
+		Ref<DynObject> result = parser.parse(&iss, "<string>");
 		TEST_ASSERT(result->isBool(), "the result is not a JSONNumber as expected");
-		Ref<JSONBoolean> number = result;
+		Ref<DynBoolean> number = result;
 		TEST_EQUALS(value, number->getValue(), "the value of the json bool is not what was expected");
 	}
 
@@ -223,16 +243,16 @@ public:
 		istringstream iss("{\"value\": 12, \"some_list\": [1, 2, 3]}");
 		JSONParser parser;
 		
-		Ref<JSONObject> result = parser.parse(&iss, "<string>");
+		Ref<DynObject> result = parser.parse(&iss, "<string>");
 		TEST_ASSERT(result->isDict(), "the result is not a JSONDict as expected");
 		
-		Ref<JSONDict> dict = result;
+		Ref<DynDict> dict = result;
 		TEST_EQUALS(2, dict->getSize(), "the size of the json dict is not what is expected");
 		
 		TEST_EQUALS(2, result->getSize(), "the size of the json dict is not what is expected");
-		TEST_ASSERT(result->hasItem("value"), "the parsed json dict doesn't have the expected keys");
-		TEST_ASSERT(result->getItem("value")->getInt() == 12, "a json dict item doesn't have the expected value");
-		TEST_ASSERT(result->hasItem("some_list"), "the parsed json dict doesn't have the expected keys");
+		TEST_ASSERT(result->hasStrItem("value"), "the parsed json dict doesn't have the expected keys");
+		TEST_ASSERT(result->getStrItem("value")->getInt() == 12, "a json dict item doesn't have the expected value");
+		TEST_ASSERT(result->hasStrItem("some_list"), "the parsed json dict doesn't have the expected keys");
 	}
 };
 
