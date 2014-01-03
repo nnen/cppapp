@@ -9,6 +9,7 @@ using namespace cppapp;
 #include "JSONTest.h"
 #include "StringUtilsTest.h"
 #include "DynObjectTest.h"
+#include "InjectorTest.h"
 
 
 class BacktraceTest : public TestCase {
@@ -20,9 +21,11 @@ public:
 	
 	void testPrint()
 	{
+		ostringstream out;
+		
 		Backtrace bt;
 		bt.get();
-		bt.print(std::cout);
+		bt.print(out);
 	}
 };
 

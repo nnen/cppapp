@@ -14,7 +14,6 @@
 #include <exception>
 #include <cstring>
 #include <cerrno>
-using namespace std;
 
 
 namespace cppapp {
@@ -68,7 +67,7 @@ struct Error {
 };
 
 
-ostream& operator<<(ostream &output, const Error &error);
+std::ostream& operator<<(std::ostream &output, const Error &error);
 
 
 /**

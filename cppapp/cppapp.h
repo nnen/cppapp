@@ -14,6 +14,7 @@
 #include "Config.h"
 #include "DynObject.h"
 #include "Exception.h"
+#include "Injector.h"
 #include "Input.h"
 #include "Lexer.h"
 #include "Logger.h"

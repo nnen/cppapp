@@ -10,6 +10,11 @@
 #define TEXTLOC_ON5JQBQJ
 
 #include <string>
+#include <ostream>
+
+
+namespace cppapp {
+
 
 /**
  * \todo Write documentation for class TextLoc.
@@ -38,10 +43,20 @@ struct TextLoc {
 	TextLoc newLine() { return TextLoc(fileName, line + 1, 0); }
 	
 	TextLoc operator+(int rhs)
-	{
+	{ 
 		return TextLoc(fileName, line, column + 1);
 	}
 };
+
+
+std::ostream& operator<<(std::ostream &out, const TextLoc &loc);
+
+
+#define CPPAPP_TEXT_LOC TextLoc(__FILE__, __LINE__)
+
+
+} // namespace cppapp
+
 
 #endif /* end of include guard: TEXTLOC_ON5JQBQJ */
 

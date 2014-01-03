@@ -73,7 +73,7 @@ Ref<DynObject> DynObject::getDottedItem(std::string key)
 	
 	Ref<DynObject> result = this;
 	
-	for (int i = 0; i < nameParts.size(); i++) {
+	for (unsigned int i = 0; i < nameParts.size(); i++) {
 		result = result->getStrItem(nameParts[i]);
 		if (result->isError())
 			return result;
@@ -90,7 +90,7 @@ void DynObject::setDottedItem(std::string key, Ref<DynObject> value)
 
 	Ref<DynObject> target = this;
 	
-	int i = 0;
+	unsigned int i = 0;
 	for (; i < nameParts.size() - 1; i++) {
 		target = target->getStrItem(nameParts[i]);
 		if (target->isError())
@@ -106,6 +106,12 @@ bool DynObject::equals(Ref<DynObject> other) const
 	if (this == other.getPtr())
 		return true;
 	return false;
+}
+
+
+Ref<DynObject> DynObject::getNext()
+{
+	return DYN_MAKE_ERROR("End of iteration.");
 }
 
 
@@ -164,7 +170,7 @@ void DynDict::setStrItem(std::string key, Ref<DynObject> value)
 
 bool DynList::hasIntItem(int index)
 {
-	if ((index < 0) || (index >= _values.size()))
+	if ((index < 0) || (index >= (int)_values.size()))
 		return false;
 	return true;
 }
@@ -172,7 +178,7 @@ bool DynList::hasIntItem(int index)
 
 Ref<DynObject> DynList::getIntItem(int key)
 {
-	if ((key < 0) || (key >= _values.size()))
+	if ((key < 0) || (key >= (int)_values.size()))
 		return DYN_MAKE_ERROR("");
 	
 	return _values[key];
@@ -181,20 +187,33 @@ Ref<DynObject> DynList::getIntItem(int key)
 
 void DynList::setIntItem(int key, Ref<DynObject> value)
 {
-	if ((key < 0) || (key >= _values.size()))
+	if ((key < 0) || (key >= (int)_values.size()))
 		return;
-
+	
 	_values[key] = value;
 }
 
 
-Ref<DynObject> DynList::get(int index)
+Ref<DynObject> DynList::getIterator()
 {
-	if ((index < 0) || (index >= (int)_values.size())) {
-		return DynNull::getInstance();
+	return new DynListIter(this);
+}
+
+
+Ref<DynObject> DynListIter::getNext()
+{
+	if (started_) {
+		iterator_++;
+	} else  {
+		started_ = true;
+		iterator_ = list_->begin();
 	}
 	
-	return _values[index];
+	if (iterator_ >= list_->end()) {
+		return DYN_MAKE_ERROR("End of list iteration.");
+	}
+	
+	return *iterator_;
 }
 
 

@@ -26,6 +26,14 @@
 namespace cppapp {
 
 
+/** \addtogroup dynamic
+ *
+ * \brief Dymaic object system.
+ *
+ * @{
+ */
+
+
 //// DynObject //////////////////////////////////////////////////////
 
 class DynBoolean;
@@ -78,6 +86,9 @@ public:
 	
 	virtual bool equals(Ref<DynObject> other) const;
 	
+	virtual Ref<DynObject> getIterator() { return this; }
+	virtual Ref<DynObject> getNext();
+	
 	virtual Ref<DynBoolean> toBool();
 	virtual Ref<DynNumber>  toNum();
 	virtual Ref<DynString>  toString();
@@ -87,6 +98,15 @@ public:
 	virtual int         getInt() const    { return (int)getDouble(); }
 	virtual std::string getString() const { return "DynObject"; }
 };
+
+
+#define DYN_FOR_EACH(it_name__, collection__) \
+	for ( \
+		Ref<DynObject> iterator__ = collection__->getIterator(), \
+		it_name__ = iterator__->getNext(); \
+		!it_name__->isError(); \
+		it_name__ = iterator__->getNext() \
+	)
 
 
 //// DynDict ////////////////////////////////////////////////////////
@@ -133,6 +153,9 @@ public:
 //// DynList ////////////////////////////////////////////////////////
 
 class DynList : public DynObject {
+public:
+	typedef std::vector<Ref<DynObject> > Vector;
+
 private:
 	std::vector<Ref<DynObject> > _values;
 
@@ -150,9 +173,29 @@ public:
 	virtual bool            hasIntItem(int index);
 	virtual Ref<DynObject>  getIntItem(int key);
 	virtual void            setIntItem(int key, Ref<DynObject> value);
+
+	virtual Ref<DynObject> getIterator();
 	
 	void append(Ref<DynObject> obj) { _values.push_back(obj); }
-	Ref<DynObject> get(int index);
+	
+	Vector::iterator begin() { return _values.begin(); }
+	Vector::iterator end()   { return _values.end(); }
+};
+
+
+class DynListIter : public DynObject {
+private:
+	bool                      started_;
+	DynList::Vector::iterator iterator_;
+	Ref<DynList>              list_;
+
+public:
+	DynListIter(Ref<DynList> list) :
+		started_(false),
+		list_(list)
+	{ }
+	
+	virtual Ref<DynObject> getNext();
 };
 
 
@@ -178,7 +221,7 @@ public:
 class DynBoolean : public DynScalar<bool> {
 public:
 	DynBoolean(TextLoc loc, bool value) :
-		DynScalar(loc, value)
+		DynScalar<bool>(loc, value)
 	{}
 	
 	virtual bool isBool() const { return true; }
@@ -199,7 +242,7 @@ public:
 class DynNumber : public DynScalar<double> {
 public:
 	DynNumber(TextLoc loc, double value) :
-		DynScalar(loc, value)
+		DynScalar<double>(loc, value)
 	{}
 	
 	virtual bool isNum() const { return true; }
@@ -224,7 +267,7 @@ public:
 class DynString : public DynScalar<std::string> {
 public:
 	DynString(TextLoc loc, std::string value) :
-		DynScalar(loc, value)
+		DynScalar<std::string>(loc, value)
 	{}
 	
 	virtual bool isString() const { return true; }
@@ -281,6 +324,9 @@ public:
 	(msg),                            \
 	TextLoc(__FILE__, __LINE__)       \
 );
+
+
+/** @} */
 
 
 } // namespace cppapp

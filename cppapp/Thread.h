@@ -11,8 +11,6 @@
 
 
 #include <cassert>
-using namespace std;
-
 #include <pthread.h>
 
 
@@ -20,6 +18,9 @@ namespace cppapp {
 
 
 /** \addtogroup threading
+ *
+ * \brief POSIX thread library wrapper
+ *
  * @{
  */
 

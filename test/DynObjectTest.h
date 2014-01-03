@@ -28,7 +28,7 @@ public:
 	{
 		TEST_ADD(DynObjectTest, testGetDottedItem);
 	}
-
+	
 	void testGetDottedItem()
 	{
 		Ref<DynObject> obj = new DynDict(TextLoc());
@@ -61,6 +61,42 @@ public:
 };
 
 RUN_SUITE(DynObjectTest);
+
+
+class DynListTest : public TestCase {
+public:
+	DynListTest()
+	{
+		TEST_ADD(DynListTest, testGetIterator);
+	}
+	
+	void testGetIterator()
+	{
+		Ref<DynList> list = new DynList(CPPAPP_TEXT_LOC);
+		int index = 0;
+		
+		DYN_FOR_EACH(item, list) {
+			TEST_ASSERT(item == list->getIntItem(index), "iterated item doesn't have the expected value");
+			index++;
+		}
+		TEST_EQUALS(0, index, "the cycle made unexpected number of iterations");
+		
+		list->append(new DynNumber(CPPAPP_TEXT_LOC, 98));
+		list->append(new DynNumber(CPPAPP_TEXT_LOC, 23));
+		list->append(new DynNumber(CPPAPP_TEXT_LOC, 54));
+		list->append(new DynNumber(CPPAPP_TEXT_LOC, 42));
+		TEST_EQUALS(4, list->getSize(), "list has unexpected size");
+		
+		int index2 = 0;
+		DYN_FOR_EACH(item2, list) {
+			TEST_ASSERT(item2 == list->getIntItem(index2), "iterated item doesn't have the eitem2pected value");
+			index2++;
+		}
+		TEST_EQUALS(4, index2, "the cycle made unexpected number of iterations");
+	}
+};
+
+RUN_SUITE(DynListTest);
 
 
 #endif /* end of include guard: DYNOBJECTTEST_ZZGY7R */

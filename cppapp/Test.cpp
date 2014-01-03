@@ -249,7 +249,7 @@ void TextTestRunner::finishTests(const TestSuite &tests)
 	for (int i = 0; i < 80; i++)
 		*output_ << "=";
 	*output_ << std::endl;
-	*output_ << "\033[1m" << getTestCount() << " tests run, ";
+	*output_ << "\033[1m" << getTestCount() << " tests run\033[0m, ";
 	
 	if (getFailureCount() == 0)
 		*output_ << getFailureCount() << " failures, ";

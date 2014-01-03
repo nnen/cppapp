@@ -9,3 +9,16 @@
 #include "TextLoc.h"
 
 
+namespace cppapp {
+
+
+std::ostream& operator<<(std::ostream &out, const TextLoc &loc)
+{
+	out << loc.fileName << ":" << loc.line;
+	return out;
+}
+
+
+} // namespace cppapp
+
+
