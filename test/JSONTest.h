@@ -135,22 +135,26 @@ RUN_SUITE(JSONNumberTest);
 /**
  * \todo Write documentation for class JSONTest.
  */
-class JSONTest : public TestCase {
+class JSONParserTest : public TestCase {
 private:
 	
 public:
 	/**
 	 * Constructor.
 	 */
-	JSONTest()
+	JSONParserTest()
 	{
-		TEST_ADD(JSONTest, testParseComplex);
-		TEST_ADD(JSONTest, testParseEmptyDict);
-		TEST_ADD(JSONTest, testParseEmptyList);
-		TEST_ADD(JSONTest, testParseEmptyString);
-		TEST_ADD(JSONTest, testParseNumber);
-		TEST_ADD(JSONTest, testParseBool);
-		TEST_ADD(JSONTest, testParseDict);
+		TEST_ADD(JSONParserTest, testParseComplex);
+		TEST_ADD(JSONParserTest, testParseEmptyDict00);
+		TEST_ADD(JSONParserTest, testParseEmptyDict01);
+		TEST_ADD(JSONParserTest, testParseEmptyList00);
+		TEST_ADD(JSONParserTest, testParseEmptyList01);
+		TEST_ADD(JSONParserTest, testParseEmptyString00);
+		TEST_ADD(JSONParserTest, testParseEmptyString01);
+		TEST_ADD(JSONParserTest, testParseNumber);
+		TEST_ADD(JSONParserTest, testParseBool);
+		TEST_ADD(JSONParserTest, testParseDict);
+		TEST_ADD(JSONParserTest, testParseDict);
 	}
 	
 	void testParseComplex()
@@ -172,7 +176,7 @@ public:
 		TEST_ASSERT(result->isDict(), "the result is not a DynDict");
 	}
 	
-	void testParseEmptyDict()
+	void testParseEmptyDict00()
 	{
 		istringstream iss("{}");
 		JSONParser parser;
@@ -181,23 +185,57 @@ public:
 		TEST_ASSERT(result->isDict(), "the result is not a JSONDict as expected");
 	}
 	
-	void testParseEmptyList()
+	void testParseEmptyDict01()
+	{
+		istringstream iss("{");
+		JSONParser parser;
+		
+		Ref<DynObject> result = parser.parse(&iss, "<string>");
+		TEST_ASSERT(result->isError(),
+				  "the result is not a JSONError as expected");
+
+	}
+	
+	void testParseEmptyList00()
 	{
 		istringstream iss("[]");
 		JSONParser parser;
 		
 		Ref<DynObject> result = parser.parse(&iss, "<string>");
-		TEST_ASSERT(result->isList(), "the result is not a JSONList as expected");
+		TEST_ASSERT(result->isList(),
+				  "the result is not a JSONList as expected");
 	}
-
-	void testParseEmptyString()
+	
+	void testParseEmptyList01()
+	{
+		istringstream iss("[");
+		JSONParser parser;
+		
+		Ref<DynObject> result = parser.parse(&iss, "<string>");
+		TEST_ASSERT(result->isError(),
+				  "the result is not a JSONError as expected");
+	}
+	
+	void testParseEmptyString00()
 	{
 		istringstream iss("\"\"");
 		JSONParser parser;
 		
 		Ref<DynObject> result = parser.parse(&iss, "<string>");
-		TEST_ASSERT(result->isString(), "the result is not a JSONString as expected");
+		TEST_ASSERT(result->isString(),
+				  "the result is not a JSONString as expected");
 	}
+	
+	void testParseEmptyString01()
+	{
+		istringstream iss("\"");
+		JSONParser parser;
+		
+		Ref<DynObject> result = parser.parse(&iss, "<string>");
+		TEST_ASSERT(result->isError(),
+				  "the result is not a JSONError as expected");
+	}
+
 	
 	void testParseNumber(const char *json, double value)
 	{
@@ -218,7 +256,7 @@ public:
 		testParseNumber("0.12345", 0.12345L);
 		testParseNumber("12345.12", 12345.12L);
 	}
-
+	
 	void testParseBool(const char *json, bool value)
 	{
 		istringstream iss(json);
@@ -256,7 +294,7 @@ public:
 	}
 };
 
-RUN_SUITE(JSONTest);
+RUN_SUITE(JSONParserTest);
 
 #endif /* end of include guard: JSONTEST_OXFQ7L0M */
 
