@@ -97,6 +97,11 @@ public:
 	virtual double      getDouble() const { return 0; }
 	virtual int         getInt() const    { return (int)getDouble(); }
 	virtual std::string getString() const { return "DynObject"; }
+	
+	operator bool()        { return getBool(); }
+	operator double()      { return getDouble(); }
+	operator int()         { return getInt(); }
+	operator std::string() { return getString(); }
 };
 
 

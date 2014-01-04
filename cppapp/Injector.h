@@ -94,6 +94,7 @@ public:
 
 class DIPlan : public Object {
 private:
+	bool                      hasKey_;
 	std::string               key_;
 	Ref<DIFactory>            factory_;
 	std::vector<Ref<DIPlan> > children_;
@@ -101,10 +102,33 @@ private:
 	Ref<DynObject>            config_;
 
 public:
+	DIPlan(bool                             hasKey,
+		  std::string                      key,
+	       Ref<DIFactory>                   factory,
+		  const std::vector<Ref<DIPlan> > &children,
+		  Ref<DynObject>                   config) :
+		hasKey_(hasKey),
+		key_(key),
+		factory_(factory),
+		children_(children),
+		config_(config)
+	{}
+
+	DIPlan(Ref<DIFactory>                   factory,
+		  const std::vector<Ref<DIPlan> > &children,
+		  Ref<DynObject>                   config) :
+		hasKey_(false),
+		key_(""),
+		factory_(factory),
+		children_(children),
+		config_(config)
+	{}
+	
 	DIPlan(std::string                      key,
 		  Ref<DIFactory>                   factory,
 		  const std::vector<Ref<DIPlan> > &children,
 		  Ref<DynObject>                   config) :
+		hasKey_(true),
 		key_(key),
 		factory_(factory),
 		children_(children),
@@ -113,6 +137,7 @@ public:
 	
 	virtual ~DIPlan() {}
 	
+	virtual bool        hasKey() const { return hasKey_; }
 	virtual std::string getKey() const { return key_; }
 	
 	virtual Ref<DIObject> instantiate();
@@ -147,12 +172,12 @@ public:
 	 */
 	virtual ~Injector() {}
 	
-	void registerFactory(std::string name, Ref<DIFactory> factory);
+	void           registerFactory(std::string name, Ref<DIFactory> factory);
 	Ref<DIFactory> getFactory(std::string name);
 	
 	Ref<DIPlan> makePlan(Ref<DynObject> config);
 	Ref<DIPlan> getPlan(std::string name);
-	void makePlans(Ref<DynObject> config);
+	void        makePlans(Ref<DynObject> config);
 	
 	Ref<DIObject> instantiate(std::string planName);
 	
@@ -162,11 +187,11 @@ public:
 		Ref<DIObject> obj = instantiate(planName);
 		Ref<T> result = obj.as<T>();
 		if (result.isNull()) {
-			LOG_ERROR("Could not dynamically cast a configured object.");
+			LOG_ERROR("Could not dynamically cast a configured object (did you use the right factory?).");
 		}
 		return result;
 	}
-
+	
 	void clear()
 	{
 		factories_.clear();

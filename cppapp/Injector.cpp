@@ -71,17 +71,7 @@ Ref<DIPlan> Injector::makePlan(Ref<DynObject> config)
 	CPPAPP_ASSERT(config.isNotNull());
 	CPPAPP_ASSERT(!config->isError());
 	
-	if (!config->hasStrItem(DI_KEY_CFG_KEY)) {
-		LOG_ERROR(
-			"Could not instantiate object configured at " <<
-			config->getLocation() <<
-			" - configuration doesn't have the \"" <<
-			DI_KEY_CFG_KEY <<
-			"\" key."
-		);
-		return NULL;
-	}
-	
+	// Test is config has a factory name
 	if (!config->hasStrItem(DI_FACTORY_CFG_KEY)) {
 		LOG_ERROR(
 			"Could not instantiate object configured at " <<
@@ -93,11 +83,19 @@ Ref<DIPlan> Injector::makePlan(Ref<DynObject> config)
 		return NULL;
 	}
 	
-	std::string key =
-		config->getStrItem(DI_KEY_CFG_KEY)->getString();
+	// Get plan key
+	bool        hasKey = false;
+	std::string key;
+	if (config->hasStrItem(DI_KEY_CFG_KEY)) {
+		hasKey = true;
+		key    = config->getStrItem(DI_KEY_CFG_KEY)->getString();
+	}
+	
+	// Get factory name
 	std::string factoryName =
 		config->getStrItem(DI_FACTORY_CFG_KEY)->getString();
 	
+	// Get the appropriate factory
 	Ref<DIFactory> factory = factories_[factoryName];
 	if (factory.isNull()) {
 		LOG_ERROR(
@@ -110,6 +108,7 @@ Ref<DIPlan> Injector::makePlan(Ref<DynObject> config)
 		return NULL;
 	}
 	
+	// Get the children config and make children plans
 	Ref<DynObject> childrenConfig = config->getStrItem("children");
 	std::vector<Ref<DIPlan> > children;
 	
@@ -125,7 +124,9 @@ Ref<DIPlan> Injector::makePlan(Ref<DynObject> config)
 		}
 	}
 	
+	// Return the plan
 	return new DIPlan(
+		hasKey,
 		key,
 		factory,
 		children,
@@ -145,7 +146,7 @@ void Injector::makePlans(Ref<DynObject> config)
 	DYN_FOR_EACH(planConfig, config) {
 		Ref<DIPlan> plan = makePlan(planConfig);
 		
-		if (plan.isNotNull()) {
+		if (plan.isNotNull() && plan->hasKey()) {
 			plans_[plan->getKey()] = plan;
 		}
 	}
