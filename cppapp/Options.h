@@ -20,12 +20,18 @@
 
 #include "utils.h"
 #include "Config.h"
+#include "DynObject.h"
 
 
 using namespace std;
 
 
 namespace cppapp {
+
+
+/** \addtogroup app
+ * @{
+ */
 
 
 /**
@@ -118,6 +124,8 @@ struct Option {
 			config->set(ConfigValue::make(configKey, isSet));
 		}
 	}
+	
+	void setConfigKey(Ref<DynObject> config) const;
 };
 
 
@@ -180,10 +188,14 @@ public:
 	bool isValid() const { return valid; }
 	
 	void setConfigKeys(Ref<Config> config) const;
+	void setConfigKeys(Ref<DynObject> config) const;
 	
 	void printUsage(ostream& output);
 	void dump(ostream& output);
 };
+
+
+/** @} */
 
 
 } // namespace cppapp

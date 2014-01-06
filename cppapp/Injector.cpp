@@ -32,12 +32,12 @@ DIFunctionRegistration::DIFunctionRegistration(std::string name,
 ////////////////////////////////////////////////////////////////////////////////
 
 
-Ref<DIObject> DIPlan::instantiate()
+Ref<DIObject> DIPlan::instantiate(Ref<DIObject> parent)
 {
-	Ref<DIObject> obj = factory_->create(config_);
+	Ref<DIObject> obj = factory_->create(config_, parent);
 	
 	FOR_EACH(children_, it) {
-		Ref<DIObject> child = (*it)->instantiate();
+		Ref<DIObject> child = (*it)->instantiate(obj);
 		obj->injectDependency(child, (*it)->getKey());
 	}
 	
@@ -156,10 +156,14 @@ void Injector::makePlans(Ref<DynObject> config)
 Ref<DIObject> Injector::instantiate(std::string planName)
 {
 	Ref<DIPlan> plan = getPlan(planName);
-	if (plan.isNull())
+	if (plan.isNull()) {
+		LOG_ERROR(
+			"Cannot instantiate configured object - plan \"" << planName << "\" does not exist."
+		);
 		return NULL;
+	}
 	
-	return plan->instantiate();
+	return plan->instantiate(NULL);
 }
 
 

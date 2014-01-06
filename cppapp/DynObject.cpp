@@ -20,6 +20,12 @@ namespace cppapp {
 ////////////////////////////////////////////////////////////////////////////////
 
 
+void DynObject::print(Ref<PrettyPrinter> printer, int level)
+{
+	printer->print("<dynamic object>");
+}
+
+
 Ref<DynObject> DynObject::getStrItem(std::string key, Ref<DynObject> deflt)
 {
 	return DYN_MAKE_ERROR("Key error.");
@@ -101,6 +107,42 @@ void DynObject::setDottedItem(std::string key, Ref<DynObject> value)
 }
 
 
+bool DynObject::getStrBool(std::string key, bool defaultValue)
+{
+	Ref<DynObject> obj = getStrItem(key, NULL);
+	if (obj.isNull())
+		return defaultValue;
+	return obj->getBool();
+}
+
+
+int DynObject::getStrInt(std::string key, int defaultValue)
+{
+	Ref<DynObject> obj = getStrItem(key, NULL);
+	if (obj.isNull())
+		return defaultValue;
+	return obj->getInt();
+}
+
+
+double DynObject::getStrDouble(std::string key, double defaultValue)
+{
+	Ref<DynObject> obj = getStrItem(key, NULL);
+	if (obj.isNull())
+		return defaultValue;
+	return obj->getDouble();
+}
+
+
+std::string DynObject::getStrString(std::string key, std::string defaultValue)
+{
+	Ref<DynObject> obj = getStrItem(key, NULL);
+	if (obj.isNull())
+		return defaultValue;
+	return obj->getString();
+}
+
+
 bool DynObject::equals(Ref<DynObject> other) const
 {
 	if (this == other.getPtr())
@@ -138,6 +180,26 @@ Ref<DynString> DynObject::toString()
 ////////////////////////////////////////////////////////////////////////////////
 
 
+void DynDict::print(Ref<PrettyPrinter> printer, int level)
+{
+	printer->print("{\n");
+	printer->indent();
+	
+	FOR_EACH(_values, it) {
+		printer->print("\"");
+		printer->print(it->first);
+		printer->print("\": ");
+		printer->indentCurrent();
+		it->second->print(printer, level + 1);
+		printer->unindent();
+		printer->print(",\n");
+	}
+	
+	printer->unindent();
+	printer->print("}");
+}
+
+
 bool DynDict::hasStrItem(std::string key)
 {
 	VAR(found, _values.find(key));
@@ -166,6 +228,21 @@ void DynDict::setStrItem(std::string key, Ref<DynObject> value)
 ////////////////////////////////////////////////////////////////////////////////
 // DynList class
 ////////////////////////////////////////////////////////////////////////////////
+
+
+void DynList::print(Ref<PrettyPrinter> printer, int level)
+{
+	printer->print("[\n");
+	printer->indent();
+	
+	FOR_EACH(_values, it) {
+		(*it)->print(printer, level + 1);
+		printer->print(",\n");
+	}
+	
+	printer->unindent();
+	printer->print("]");
+}
 
 
 bool DynList::hasIntItem(int index)
@@ -222,6 +299,12 @@ Ref<DynObject> DynListIter::getNext()
 ////////////////////////////////////////////////////////////////////////////////
 
 
+void DynBoolean::print(Ref<PrettyPrinter> printer, int level)
+{
+	printer->print(getValue() ? "true" : "false");
+}
+
+
 bool DynBoolean::parse(Lexer *lexer, bool *result)
 {
 	lexer->skipWhitespace();
@@ -255,6 +338,15 @@ bool DynBoolean::parse(std::string str, bool *result)
 ////////////////////////////////////////////////////////////////////////////////
 // DynNumber class
 ////////////////////////////////////////////////////////////////////////////////
+
+
+void DynNumber::print(Ref<PrettyPrinter> printer, int level)
+{
+	std::stringstream s;
+	s << getValue();
+	printer->print(s.str());
+	//printer->printf("%d", getValue());
+}
 
 
 bool DynNumber::parse(Lexer *lexer, double *result)
@@ -303,12 +395,26 @@ bool DynNumber::parse(std::string str, double *result)
 ////////////////////////////////////////////////////////////////////////////////
 
 
+void DynString::print(Ref<PrettyPrinter> printer, int level)
+{
+	printer->print("\"");
+	printer->print(getValue());
+	printer->print("\"");
+}
+
+
 bool DynString::getBool() const
 {
 	bool result;
 	if (DynBoolean::parse(getValue(), &result))
 		return result;
-	return true;
+	LOG_WARNING(
+		"Could not parse string as boolean value: \"" << 
+		getValue() <<
+		"\" at " << 
+		getLocation()
+	);
+	return false;
 }
 
 
@@ -317,6 +423,12 @@ double DynString::getDouble() const
 	double result;
 	if (DynNumber::parse(getValue(), &result))
 		return result;
+	LOG_WARNING(
+		"Could not parse string as number: \"" << 
+		getValue() <<
+		"\" at " << 
+		getLocation()
+	);
 	return 0.0;
 }
 

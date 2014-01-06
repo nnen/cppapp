@@ -42,9 +42,18 @@ void Backtrace::getSymbols()
 	
 	std::vector<std::string> symbols;
 	symbols.reserve(addresses_.size());
+
+	std::vector<char> buffer;
 	
 	for (unsigned int i = 0; i < addresses_.size(); i++) {
-		symbols.push_back(std::string(strings[i]));
+		size_t length = 0;
+		int status = 0;
+		char *output = abi::__cxa_demangle(strings[i], NULL, &length, &status);
+		if (status == 0)
+			symbols.push_back(std::string(output));
+		else	
+			symbols.push_back(std::string(strings[i]));
+		free(output);
 	}
 	
 	symbols_.swap(symbols);
@@ -52,11 +61,26 @@ void Backtrace::getSymbols()
 }
 
 
-void Backtrace::print(ostream &out)
+void Backtrace::print(ostream &out) const
 {
 	for (unsigned int i = 0; i < symbols_.size(); i++) {
 		out << symbols_[i] << std::endl;
 	}
+}
+
+
+std::ostream& operator<< (std::ostream &output, const Backtrace &bt)
+{
+	bt.print(output);
+	return output;
+}
+
+
+void Backtrace::print()
+{
+	Backtrace bt;
+	bt.get();
+	std::cerr << bt << endl;
 }
 
 

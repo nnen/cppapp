@@ -63,6 +63,57 @@ public:
 RUN_SUITE(DynObjectTest);
 
 
+class DynStringTest : public TestCase {
+public:
+	DynStringTest()
+	{
+		TEST_ADD(DynStringTest, testGetBool00);
+		TEST_ADD(DynStringTest, testGetDouble00);
+		TEST_ADD(DynStringTest, testGetInt00);
+		TEST_ADD(DynStringTest, testGetString00);
+	}
+	
+	void testGetBool00()
+	{
+		Ref<DynObject> str = new DynString(TextLoc(), "true");
+		TEST_EQUALS(true, str->getBool(), "the string should convert to true");
+		
+		str = new DynString(TextLoc(), "false");
+		TEST_EQUALS(false, str->getBool(), "the string should convert to false");
+	}
+	
+	void testGetDouble00()
+	{
+		for (double i = 0; i < 1000; i += 10) {
+			std::stringstream s;
+			s << i;
+			
+			Ref<DynObject> str = new DynString(CPPAPP_TEXT_LOC, s.str());
+			TEST_EQUALS(i, str->getDouble(), "the string should convert to a number");
+		}
+	}
+	
+	void testGetInt00()
+	{
+		for (int i = 0; i < 1000; i += 10) {
+			std::stringstream s;
+			s << i;
+			
+			Ref<DynObject> str = new DynString(CPPAPP_TEXT_LOC, s.str());
+			TEST_EQUALS(i, str->getInt(), "the string should convert to a number");
+		}
+	}
+
+	void testGetString00()
+	{
+		Ref<DynObject> str = new DynString(CPPAPP_TEXT_LOC, "hello");
+		TEST_EQUALS(std::string("hello"), str->getString(), "the string should equal to itself");
+	}
+};
+
+RUN_SUITE(DynStringTest);
+
+
 class DynListTest : public TestCase {
 public:
 	DynListTest()

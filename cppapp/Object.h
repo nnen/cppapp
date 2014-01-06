@@ -13,6 +13,8 @@
 #include <exception>
 #include <utility>
 
+#include "Debug.h"
+
 
 namespace cppapp {
 
@@ -203,22 +205,34 @@ public:
 	
 	T& operator*()
 	{
-		if (isNull())
+		if (isNull()) {
+#ifndef NDEBUG
+			Backtrace::print();
+#endif
 			throw NullReferenceException();
+		}
 		return *getPtr();
 	}
 
 	const T& operator*() const
 	{
-		if (isNull())
+		if (isNull()) {
+#ifndef NDEBUG
+			Backtrace::print();
+#endif
 			throw NullReferenceException();
+		}
 		return *getPtr();
 	}
 
 	T* operator->() const
 	{
-		if (isNull())
+		if (isNull()) {
+#ifndef NDEBUG
+			Backtrace::print();
+#endif
 			throw NullReferenceException();
+		}
 		return getPtr();
 	}
 	

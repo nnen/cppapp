@@ -18,6 +18,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <cxxabi.h>
 
 #include "utils.h"
 
@@ -88,9 +89,14 @@ public:
 	
 	void get(int maxSize = CPPAPP_BACKTRACE_LIMIT);
 	void getSymbols();
-
-	void print(ostream &out);
+	
+	void print(ostream &out) const;
+	
+	static void print();
 };
+
+
+std::ostream& operator<< (std::ostream &output, const Backtrace &bt);
 
 
 ////////////////////////////////////////////////////////////////////////////////

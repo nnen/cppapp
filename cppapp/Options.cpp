@@ -18,6 +18,44 @@ namespace cppapp {
 #define ERR(expr) { stringstream s; s << expr; error(s.str()); }
 
 
+////////////////////////////////////////////////////////////////////////////////
+// Option
+////////////////////////////////////////////////////////////////////////////////
+
+
+void Option::setConfigKey(Ref<DynObject> config) const
+{
+	if (configKey.size() == 0)
+		return;
+	
+	Ref<DynObject> value;
+	if (takesArgument) {
+		if (!isSet) return;
+		value = new DynString(TextLoc("<command line>"), argument);
+	} else {
+		value = new DynBoolean(TextLoc("<command line>"), isSet);
+	}
+	
+	vector<string> parts;
+	Strings::split(configKey, ".", &parts);
+	
+	Ref<DynObject> target = config;
+	for (int i = 0; i < (parts.size() - 1); i++) {
+		target = target->getStrItem(parts[i]);
+		if (target->isError()) {
+			return;
+		}
+	}
+	
+	target->setStrItem(parts[parts.size() - 1], value);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Options
+////////////////////////////////////////////////////////////////////////////////
+
+
 void Options::error(string message)
 {
 	cerr << message << endl;
@@ -130,6 +168,14 @@ Option& Options::get(string configKey)
 
 
 void Options::setConfigKeys(Ref<Config> config) const
+{
+	FOR_EACH(options, it) {
+		it->second.setConfigKey(config);
+	}
+}
+
+
+void Options::setConfigKeys(Ref<DynObject> config) const
 {
 	FOR_EACH(options, it) {
 		it->second.setConfigKey(config);

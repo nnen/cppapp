@@ -18,6 +18,7 @@
 
 #include "Object.h"
 #include "Lexer.h"
+#include "Input.h"
 #include "DynObject.h"
 #include "utils.h"
 
@@ -31,6 +32,7 @@ class JSONParser {
 private:
 	Lexer lexer;
 	
+	Ref<DynError> returnError(TextLoc location);
 	Ref<DynError> returnError(const char *fn, int line);
 	
 	bool readObject(Ref<DynObject> *result);
@@ -45,6 +47,7 @@ private:
 
 public:
 	Ref<DynObject> parse(std::istream *input, std::string fileName);
+	Ref<DynObject> parse(Ref<Input> input);
 	
 	static bool strToBool(Lexer *lexer, double *result);
 	static bool strToDouble(Lexer *lexer, double *result);

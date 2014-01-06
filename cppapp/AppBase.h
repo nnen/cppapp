@@ -27,11 +27,20 @@
 namespace cppapp {
 
 
+/** \addtogroup app
+ *
+ * \brief Application framework
+ *
+ * @{
+ */
+
+
 /**
  * \brief Base class for unix commnad-line applications.
  */
 class AppBase : public Object {
 private:
+	bool        readConfig_;
 	Ref<Config> config_;
 	
 	Options     options_;
@@ -40,7 +49,7 @@ private:
 	AppBase(const AppBase& other);
 
 protected:
-	virtual string      getDefaultConfigFile() const;
+	virtual string      getDefaultConfigFile();
 	Ref<Config>         config() { return config_; }
 	void                setConfig(Ref<Config> cfg) { config_ = cfg; }
 	
@@ -51,13 +60,18 @@ protected:
 	void                setOutput(Ref<Output> output) { output_ = output; }
 	
 	virtual void        printUsage(std::ostream& out);
+	virtual void        readConfig();
 	virtual void        setUp();
 	virtual int         onRun();
 
 public:
 	AppBase();
+	AppBase(bool readConfig);
 	virtual ~AppBase() {}
 	
+	/**
+	 * Executes the application in the current thread.
+	 */
 	int run(int argc, char* argv[]);
 };
 
@@ -76,6 +90,9 @@ int main(int argc, char* argv[]) \
 	App app; \
 	return app.run(argc, argv); \
 }
+
+
+/** @} */
 
 
 } // namespace cppapp

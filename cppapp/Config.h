@@ -59,7 +59,7 @@ class Config : public Object {
 private:
 	map<string, Ref<ConfigValue> > defaults_;
 	map<string, Ref<ConfigValue> > values_;
-
+	
 	static Ref<Config> globalConfig_;
 	
 public:

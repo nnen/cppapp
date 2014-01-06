@@ -19,6 +19,8 @@
 #include "Object.h"
 #include "TextLoc.h"
 #include "Lexer.h"
+#include "Logger.h"
+#include "PrettyPrinter.h"
 #include "utils.h"
 #include "string_utils.h"
 
@@ -58,6 +60,8 @@ public:
 	
 	TextLoc getLocation() const { return location; }
 	
+	virtual void print(Ref<PrettyPrinter> printer, int level = 0);
+	
 	virtual bool isDict()   const { return false; }
 	virtual bool isList()   const { return false; }
 	virtual bool isBool()   const { return false; }
@@ -83,6 +87,11 @@ public:
 	
 	virtual Ref<DynObject>  getDottedItem(std::string key);
 	virtual void            setDottedItem(std::string key, Ref<DynObject> value);
+	
+	virtual bool            getStrBool(std::string key, bool defaultValue);
+	virtual int             getStrInt(std::string key, int defaultValue);
+	virtual double          getStrDouble(std::string key, double defaultValue);
+	virtual std::string     getStrString(std::string key, std::string defaultValue);
 	
 	virtual bool equals(Ref<DynObject> other) const;
 	
@@ -137,6 +146,8 @@ public:
 	
 	virtual int getSize() const { return _values.size(); }
 	
+	virtual void print(Ref<PrettyPrinter> printer, int level = 0);
+	
 	virtual bool           hasStrItem(std::string key);
 	virtual Ref<DynObject> getStrItem(std::string key, Ref<DynObject> deflt);
 	virtual void           setStrItem(std::string key, Ref<DynObject> value);
@@ -174,6 +185,8 @@ public:
 	virtual bool isList() const { return true; }
 	
 	virtual int getSize() const { return _values.size(); }
+	
+	virtual void print(Ref<PrettyPrinter> printer, int level = 0);
 	
 	virtual bool            hasIntItem(int index);
 	virtual Ref<DynObject>  getIntItem(int key);
@@ -229,6 +242,8 @@ public:
 		DynScalar<bool>(loc, value)
 	{}
 	
+	virtual void print(Ref<PrettyPrinter> printer, int level = 0);
+	
 	virtual bool isBool() const { return true; }
 	
 	virtual Ref<DynBoolean> toBool() { return this; }
@@ -249,6 +264,8 @@ public:
 	DynNumber(TextLoc loc, double value) :
 		DynScalar<double>(loc, value)
 	{}
+	
+	virtual void print(Ref<PrettyPrinter> printer, int level = 0);
 	
 	virtual bool isNum() const { return true; }
 
@@ -274,6 +291,8 @@ public:
 	DynString(TextLoc loc, std::string value) :
 		DynScalar<std::string>(loc, value)
 	{}
+	
+	virtual void print(Ref<PrettyPrinter> printer, int level = 0);
 	
 	virtual bool isString() const { return true; }
 	
@@ -308,10 +327,11 @@ private:
 
 public:
 	DynError(TextLoc loc, std::string message, TextLoc errorLoc) :
-		DynObject(loc), message_(message)
+		DynObject(loc), message_(message), errorLoc_(errorLoc)
 	{}
 	
 	virtual bool isError() const { return true; }
+	virtual TextLoc getErrorLoc() const { return errorLoc_; }
 	
 	virtual bool getBool() const { return false; }
 	virtual std::string getString() const

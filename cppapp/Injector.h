@@ -44,6 +44,24 @@ public:
 };
 
 
+template<class T>
+class DIBox : public DIObject {
+private:
+	Ref<T> value_;
+
+public:
+	DIBox(Ref<T> value) : value_(value) {}
+	virtual ~DIBox() { value_ = NULL; }
+	
+	Ref<T> getValue() { return value_; }
+	
+	virtual bool injectDependency(Ref<DIObject> obj, std::string key)
+	{
+		return value_->injectDependency(obj, key);
+	}
+};
+
+
 //// DIFactory //////////////////////////////////////////////////////
 
 
@@ -51,13 +69,13 @@ class DIFactory : public Object {
 public:
 	virtual ~DIFactory() {}
 	
-	virtual Ref<DIObject> create(Ref<DynObject> config) = 0;
+	virtual Ref<DIObject> create(Ref<DynObject> config, Ref<DIObject> parent) = 0;
 };
 
 
 class DIFunctionFactory : public DIFactory {
 public:
-	typedef Ref<DIObject> (*Function)(Ref<DynObject> config);
+	typedef Ref<DIObject> (*Function)(Ref<DynObject> config, Ref<DIObject> parent);
 
 private:
 	Function function_;
@@ -72,9 +90,9 @@ public:
 		function_ = NULL;
 	}
 	
-	virtual Ref<DIObject> create(Ref<DynObject> config)
+	virtual Ref<DIObject> create(Ref<DynObject> config, Ref<DIObject> parent)
 	{
-		return function_(config);
+		return function_(config, parent);
 	}
 };
 
@@ -87,6 +105,9 @@ public:
 
 #define CPPAPP_DI_FUNCTION(name__, fn__) \
 	DIFunctionRegistration DIFunctionRegistration__##fn__(name__, fn__);
+
+#define CPPAPP_DI_METHOD(name__, cls__, fn__) \
+	DIFunctionRegistration DIFunctionRegistration__##cls__##fn__(name__, cls__::fn__);
 
 
 //// DIPlan /////////////////////////////////////////////////////////
@@ -140,7 +161,11 @@ public:
 	virtual bool        hasKey() const { return hasKey_; }
 	virtual std::string getKey() const { return key_; }
 	
-	virtual Ref<DIObject> instantiate();
+	virtual Ref<DIFactory> getFactory() const { return factory_; }
+	
+	virtual TextLoc getOrigin() { return config_->getLocation(); }
+	
+	virtual Ref<DIObject> instantiate(Ref<DIObject> parent);
 };
 
 
@@ -185,9 +210,14 @@ public:
 	Ref<T> instantiateAs(std::string planName)
 	{
 		Ref<DIObject> obj = instantiate(planName);
+		if (obj.isNull()) return NULL;
 		Ref<T> result = obj.as<T>();
 		if (result.isNull()) {
-			LOG_ERROR("Could not dynamically cast a configured object (did you use the right factory?).");
+			Ref<DIPlan> plan = getPlan(planName);
+			LOG_ERROR(
+				"Could not dynamically cast a configured object (did you use the right factory?). "
+				"Object's configuration is at " << plan->getOrigin() << "."
+			);
 		}
 		return result;
 	}

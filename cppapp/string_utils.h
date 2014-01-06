@@ -15,6 +15,7 @@
 #include <algorithm> 
 #include <functional> 
 #include <cctype>
+#include <cstring>
 #include <locale>
 
 
@@ -52,9 +53,24 @@ static inline std::string toUpper(const std::string &s) {
 }
 
 
-struct Strings {
+template<class T>
+inline size_t length(T value)
+{
+	return value.size();
+}
 
-	static inline void split(std::string value, std::string separator, std::vector<std::string> *output) {
+
+template<>
+inline size_t length<const char *>(const char *value)
+{
+	return strlen(value);
+}
+
+
+struct Strings {
+	
+	static inline void split(std::string value, std::string separator, std::vector<std::string> *output)
+	{
 		size_t pos = 0;
 		
 		while (pos < value.length()) {
@@ -68,6 +84,20 @@ struct Strings {
 			output->push_back(value.substr(pos, found - pos));
 			pos = found + separator.length();
 		}
+	}
+	
+	template<class T>
+	static inline bool contains(const std::string &haystack, T needle)
+	{
+		size_t pos = haystack.find(needle);
+		return (pos != std::string::npos);
+	}
+	
+	template<class T>
+	static inline bool endsWith(const std::string &value, T suffix)
+	{
+		int l = length(suffix);
+		return (value.compare(value.size() - l, l, suffix) == 0);
 	}
 
 };

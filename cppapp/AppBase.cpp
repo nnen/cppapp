@@ -18,7 +18,7 @@ namespace cppapp {
 /**
  *
  */
-string AppBase::getDefaultConfigFile() const
+string AppBase::getDefaultConfigFile()
 {
 	ostringstream s;
 	s << getenv("HOME") <<
@@ -32,6 +32,29 @@ void AppBase::printUsage(std::ostream& out)
 {
 	options_.printUsage(out);
 	out << std::endl;
+}
+
+
+void AppBase::readConfig()
+{
+	if (!readConfig_)
+		return;
+	
+	string configFileName = config_->get(CPPAPP_CONFIG_FILE_CFG_KEY,
+								  getDefaultConfigFile())->asString();
+	
+	Ref<FileInput> configInput = new FileInput(configFileName);
+	if (configInput->exists()) {
+		ConfigParser parser(config_);
+		parser.parse(configInput);
+		configInput->close();
+	} else {
+		LOG_WARNING("Configuration file " << configFileName << " does not exist.");
+	}
+	
+	// Override the configuration read from the file by the command line
+	// options.
+	options_.setConfigKeys(config_);
 }
 
 
@@ -82,6 +105,18 @@ int AppBase::onRun()
  * Constructor.
  */
 AppBase::AppBase() :
+	readConfig_(true),
+	config_(Config::globalConfig()),
+	output_(new StandardOutput())
+{
+}
+
+
+/**
+ * Constructor.
+ */
+AppBase::AppBase(bool readConfig) :
+	readConfig_(readConfig),
 	config_(Config::globalConfig()),
 	output_(new StandardOutput())
 {
@@ -90,10 +125,12 @@ AppBase::AppBase() :
 
 int AppBase::run(int argc, char* argv[])
 {
+	// Call setUp hook.
 	setUp();
 	
 	Logger::defaultConfig();
 	
+	// Parse command line options
 	options_.parse(argc, argv);
 	if (!options_.isValid()) {
 		printUsage(std::cerr);
@@ -102,20 +139,10 @@ int AppBase::run(int argc, char* argv[])
 	if (options_.get(CPPAPP_CONFIG_FILE_CFG_KEY).isSet)
 		options_.get(CPPAPP_CONFIG_FILE_CFG_KEY).setConfigKey(config_);
 	
-	string configFileName = config_->get(CPPAPP_CONFIG_FILE_CFG_KEY,
-								  getDefaultConfigFile())->asString();
+	// Parse configuration file
+	readConfig();
 	
-	Ref<FileInput> configInput = new FileInput(configFileName);
-	if (configInput->exists()) {
-		ConfigParser parser(config_);
-		parser.parse(configInput);
-		configInput->close();
-	} else {
-		LOG_WARNING("Configuration file " << configFileName << " does not exist.");
-	}
-	
-	options_.setConfigKeys(config_);
-	
+	// Run the actual application.
 	return onRun();
 }
 

@@ -15,7 +15,7 @@ DEP_FILES    = $(foreach CPP_FILE, $(CPP_FILES), $(patsubst %.cpp,%.d,$(CPP_FILE
 
 DOCS_ARCH    = $(PROJECT_NAME)-$(VERSION)-docs.html.tar.gz
 
-CXX          = clang++
+#CXX          = clang++
 CXXFLAGS     = -Wall -ggdb3 -O0
 LDFLAGS      =
 

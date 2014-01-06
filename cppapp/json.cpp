@@ -247,6 +247,12 @@ Ref<DynObject> JSONParser::parse(std::istream *input, std::string fileName)
 }
 
 
+Ref<DynObject> JSONParser::parse(Ref<Input> input)
+{
+	return parse(input->getStream(), input->getName());
+}
+
+
 } // namespace cppapp
 
 
