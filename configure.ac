@@ -1,5 +1,5 @@
 # AC_PREREQ([2.68])
-AC_INIT([cppapp], [0.2.1], [milikjan@fit.cvut.cz])
+AC_INIT([cppapp], [0.2.1dev], [milikjan@fit.cvut.cz])
 AM_INIT_AUTOMAKE([-Wall])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
