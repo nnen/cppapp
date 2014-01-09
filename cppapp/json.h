@@ -28,12 +28,24 @@ namespace cppapp {
 
 //// JSONParser /////////////////////////////////////////////////////
 
+
+/**
+ * \brief JSON parser for an extended JSON syntax.
+ *
+ * The sytax extensions include:
+ * \li any number of commas allowed after each array item and key-value
+ *     pair in an object including the last one (<tt>[1, 2, ]</tt>),
+ * \li C++-style line comments (<tt>// a comment</tt>),
+ * \li capital letters allowed in literals (<tt>True</tt>).
+ */
 class JSONParser {
 private:
 	Lexer lexer;
 	
 	Ref<DynError> returnError(TextLoc location);
 	Ref<DynError> returnError(const char *fn, int line);
+	
+	void skipWhitespace();
 	
 	bool readObject(Ref<DynObject> *result);
 	
@@ -44,8 +56,17 @@ private:
 	bool readString(Ref<DynObject> *result);
 	bool readNumber(Ref<DynObject> *result);
 	bool readBool(Ref<DynObject> *result);
+	bool readNull(Ref<DynObject> *result);
 
 public:
+	/**
+	 * \brief Parse a single JSON value and return a reference to it.
+	 *
+	 * \param input input stream to read from
+	 * \param fileName name of the file the input comes from, this
+	 *                 value is stored with the parsed values as
+	 *                 metadata
+	 */
 	Ref<DynObject> parse(std::istream *input, std::string fileName);
 	Ref<DynObject> parse(Ref<Input> input);
 	

@@ -38,9 +38,23 @@ Ref<DynError> JSONParser::returnError(const char *fn, int line)
 }
 
 
+void JSONParser::skipWhitespace()
+{
+	while (true) {
+		lexer.skipWhitespace();
+		
+		if (!lexer.read("//"))
+			break;
+		
+		while (lexer.peek() != '\n')
+			lexer.read();
+	}
+}
+
+
 bool JSONParser::readObject(Ref<DynObject> *result)
 {
-	lexer.skipWhitespace();
+	skipWhitespace();
 	
 	if (readDict(result))
 		return true;
@@ -55,6 +69,9 @@ bool JSONParser::readObject(Ref<DynObject> *result)
 		return true;
 	
 	if (readBool(result))
+		return true;
+
+	if (readNull(result))
 		return true;
 	
 	return false;
@@ -78,7 +95,7 @@ bool JSONParser::readDict(Ref<DynObject> *result)
 	while (true) {
 		if (!readKeyValue(&key, &value))
 			break;
-
+		
 		if (value->isError()) {
 			*result = value;
 			return true;
@@ -231,6 +248,18 @@ bool JSONParser::readBool(Ref<DynObject> *result)
 		return false;
 	
 	*result = new DynBoolean(loc, value);
+	return true;
+}
+
+
+bool JSONParser::readNull(Ref<DynObject> *result)
+{
+	TextLoc loc = lexer.getLocation();
+	
+	if (!lexer.read("null"))
+		return false;
+	
+	*result = DynNull::getInstance();
 	return true;
 }
 

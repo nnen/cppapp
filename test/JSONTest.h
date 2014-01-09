@@ -155,6 +155,7 @@ public:
 		TEST_ADD(JSONParserTest, testParseBool);
 		TEST_ADD(JSONParserTest, testParseDict);
 		TEST_ADD(JSONParserTest, testParseDict);
+		TEST_ADD(JSONParserTest, testParseComment);
 	}
 	
 	void testParseComplex()
@@ -292,6 +293,18 @@ public:
 		TEST_ASSERT(result->getStrItem("value")->getInt() == 12, "a json dict item doesn't have the expected value");
 		TEST_ASSERT(result->hasStrItem("some_list"), "the parsed json dict doesn't have the expected keys");
 	}
+
+	void testParseComment()
+	{
+		istringstream iss("// some comment\n// 13\n10");
+		JSONParser parser;
+		
+		Ref<DynObject> result = parser.parse(&iss, "<string>");
+		TEST_ASSERT(result->isNum(), "the result is not a JSONNumber as expected");
+		
+		TEST_EQUALS(10, result->getInt(), "the result does not have the expected value");
+	}
+
 };
 
 RUN_SUITE(JSONParserTest);
