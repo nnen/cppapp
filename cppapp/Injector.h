@@ -33,6 +33,10 @@ class Injector;
 //// DIObject ///////////////////////////////////////////////////////
 
 
+/**
+ * \brief Base class for objects that can have dependencies injected
+ *        or can be injected as a dependency.
+ */
 class DIObject : public Object {
 public:
 	virtual ~DIObject() {} 
@@ -65,6 +69,9 @@ public:
 //// DIFactory //////////////////////////////////////////////////////
 
 
+/**
+ * \brief Base class for factory objects that are used instantiate dependencies.
+ */
 class DIFactory : public Object {
 public:
 	virtual ~DIFactory() {}
@@ -73,6 +80,9 @@ public:
 };
 
 
+/**
+ * \brief DI factory that wraps around a function or static method.
+ */
 class DIFunctionFactory : public DIFactory {
 public:
 	typedef Ref<DIObject> (*Function)(Ref<DynObject> config, Ref<DIObject> parent);
@@ -97,15 +107,25 @@ public:
 };
 
 
+/**
+ * \brief Helper class for statically registering functions or static
+ *        methods as DI factories.
+ */
 struct DIFunctionRegistration {
 public:
 	DIFunctionRegistration(std::string name, DIFunctionFactory::Function fn);
 };
 
 
+/**
+ * \brief Helper macro to register functions as DI factories.
+ */
 #define CPPAPP_DI_FUNCTION(name__, fn__) \
 	DIFunctionRegistration DIFunctionRegistration__##fn__(name__, fn__);
 
+/**
+ * \brief Helper macro to register methods as DI factories.
+ */
 #define CPPAPP_DI_METHOD(name__, cls__, fn__) \
 	DIFunctionRegistration DIFunctionRegistration__##cls__##fn__(name__, cls__::fn__);
 
@@ -113,6 +133,10 @@ public:
 //// DIPlan /////////////////////////////////////////////////////////
 
 
+/**
+ * \brief Contains information necessary to instantiate a dependecy
+ *        (including its dependencies) by name.
+ */
 class DIPlan : public Object {
 private:
 	bool                      hasKey_;
@@ -172,12 +196,16 @@ public:
 //// Injector ///////////////////////////////////////////////////////
 
 
-#define DI_KEY_CFG_KEY     "key"
-#define DI_FACTORY_CFG_KEY "factory"
+#define DI_KEY_CFG_KEY      "key"
+#define DI_FACTORY_CFG_KEY  "factory"
+#define DI_CHILDREN_CFG_KEY "children"
 
 
 /**
- * \todo Write documentation for class Injector.
+ * \brief Manager class for the dependency injection mechanism.
+ *
+ * Use this class to register dependency injection factories and
+ * instantiate dependencies.
  */
 class Injector {
 private:
@@ -188,24 +216,58 @@ private:
 	
 public:
 	/**
-	 * Constructor.
+	 * \brief Constructor.
 	 */
 	Injector() {}
 	
 	/**
-	 * Destructor.
+	 * \brief Destructor.
 	 */
 	virtual ~Injector() {}
 	
+	/**
+	 * \name Factory Management Methods
+	 */
+	///@{
+	/**
+	 * \brief Register a named factory with this injector.
+	 *
+	 * \param name    name of the factory
+	 * \param factory factory instance to register
+	 */
 	void           registerFactory(std::string name, Ref<DIFactory> factory);
+	/**
+	 * \brief Returns a named factory.
+	 *
+	 * \param name name of the factory to return
+	 *
+	 * A named factory must be registered using \ref registerFactory first.
+	 */
 	Ref<DIFactory> getFactory(std::string name);
+	///@}
 	
+	/**
+	 * \name Plan Management Methods
+	 */
+	///@{
+	Ref<DIPlan> makePlan(std::string name, Ref<DIFactory> factory, Ref<DynObject> config);
 	Ref<DIPlan> makePlan(Ref<DynObject> config);
 	Ref<DIPlan> getPlan(std::string name);
 	void        makePlans(Ref<DynObject> config);
+	///@}
 	
+	/**
+	 * \brief Instantiate a dependency using a named plan.
+	 *
+	 * \param planName name of the plan to instantiate
+	 */
 	Ref<DIObject> instantiate(std::string planName);
 	
+	/**
+	 * \brief Instantiate a dependency using a named plan and cast it to a type.
+	 *
+	 * \param planName name of the plan to instantiate
+	 */
 	template<class T>
 	Ref<T> instantiateAs(std::string planName)
 	{
@@ -222,12 +284,18 @@ public:
 		return result;
 	}
 	
+	/**
+	 * \brief Removes all factories and plans.
+	 */
 	void clear()
 	{
 		factories_.clear();
 		plans_.clear();
 	}
 	
+	/**
+	 * \brief Returns the singleton instance.
+	 */
 	static Injector& getInstance();
 };
 

@@ -66,6 +66,32 @@ Ref<DIFactory> Injector::getFactory(std::string name)
 }
 
 
+Ref<DIPlan> Injector::makePlan(std::string name, Ref<DIFactory> factory, Ref<DynObject> config)
+{
+	CPPAPP_ASSERT(factory.isNotNull());
+	CPPAPP_ASSERT(config.isNotNull());
+	CPPAPP_ASSERT(!config->isError());
+	
+	// Get the children config and make children plans
+	Ref<DynObject> childrenConfig = config->getStrItem("children");
+	std::vector<Ref<DIPlan> > children;
+	
+	if (childrenConfig.isNotNull()) {
+		DYN_FOR_EACH(child, childrenConfig) {
+			CPPAPP_ASSERT(child.isNotNull());
+			CPPAPP_ASSERT(!child->isError());
+			
+			Ref<DIPlan> plan = makePlan(child);
+			if (plan.isNull())
+				return NULL;
+			children.push_back(plan);
+		}
+	}
+	
+	return new DIPlan(name.size() > 0, name, factory, children, config);
+}
+
+
 Ref<DIPlan> Injector::makePlan(Ref<DynObject> config)
 {
 	CPPAPP_ASSERT(config.isNotNull());
@@ -109,7 +135,7 @@ Ref<DIPlan> Injector::makePlan(Ref<DynObject> config)
 	}
 	
 	// Get the children config and make children plans
-	Ref<DynObject> childrenConfig = config->getStrItem("children");
+	Ref<DynObject> childrenConfig = config->getStrItem(DI_CHILDREN_CFG_KEY);
 	std::vector<Ref<DIPlan> > children;
 	
 	if (childrenConfig.isNotNull()) {
