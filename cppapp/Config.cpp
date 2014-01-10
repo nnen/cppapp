@@ -27,7 +27,7 @@ namespace cppapp {
  * Constructor.
  */
 ConfigValue::ConfigValue(string name, string rawValue) :
-	name_(name), rawValue_(trim(rawValue))
+	name_(name), rawValue_(Strings::trim(rawValue))
 {
 }
 
@@ -37,7 +37,7 @@ ConfigValue::ConfigValue(string name, string rawValue) :
  */
 bool ConfigValue::asBool() const
 {
-	string l = toLower(rawValue_);
+	string l = Strings::toLower(rawValue_);
 	
 	if ((l.compare("f") == 0) ||
 	    (l.compare("false") == 0) ||
