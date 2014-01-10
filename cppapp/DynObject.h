@@ -30,7 +30,7 @@ namespace cppapp {
 
 /** \addtogroup dynamic
  *
- * \brief Dymaic object system.
+ * \brief Dynamic object system.
  *
  * @{
  */

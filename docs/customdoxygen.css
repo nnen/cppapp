@@ -568,14 +568,16 @@ table.memberdecls {
         //border-right: 1px solid #A8B8D9;
         //padding: 6px 0px 6px 0px;
 	   padding: 6px;
-        color: #253555;
+        //color: #253555;
+	   color: black;
         font-weight: bold;
         text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.9);
         //background-image:url('nav_f.png');
 	   background-image: none;
         //background-repeat:repeat-x;
         //background-color: #E2E8F2;
-	   background-color: rgb(235, 238, 241);
+	   //background-color: rgb(235, 238, 241);
+	   background-color: #ccc;
         /* opera specific markup */
         box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.15);
         //border-top-right-radius: 4px;
@@ -671,8 +673,10 @@ dl.reflist dd {
 }       
 
 .params .paramname, .retval .paramname {
-        font-weight: bold;
-        vertical-align: top;
+        //font-weight: bold;
+	   font-family: "Courier New", courier, monospace;
+	   font-style: italic;
+	   font-weight: normal;
 }
         
 .params .paramtype {

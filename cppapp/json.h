@@ -11,6 +11,7 @@
 
 
 #include <string>
+#include <cctype>
 #include <vector>
 #include <map>
 #include <istream>
@@ -54,6 +55,7 @@ private:
 	
 	bool readList(Ref<DynObject> *result);
 	bool readString(Ref<DynObject> *result);
+	bool readKeyword(Ref<DynObject> *result);
 	bool readNumber(Ref<DynObject> *result);
 	bool readBool(Ref<DynObject> *result);
 	bool readNull(Ref<DynObject> *result);
@@ -68,10 +70,12 @@ public:
 	 *                 metadata
 	 */
 	Ref<DynObject> parse(std::istream *input, std::string fileName);
+	/**
+	 * \brief Parse a single JSON value read from an \ref Input instance.
+	 *
+	 * \param input \ref Input instance to read the input from
+	 */
 	Ref<DynObject> parse(Ref<Input> input);
-	
-	static bool strToBool(Lexer *lexer, double *result);
-	static bool strToDouble(Lexer *lexer, double *result);
 };
 
 

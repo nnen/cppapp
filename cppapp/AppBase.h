@@ -49,28 +49,91 @@ private:
 	AppBase(const AppBase& other);
 
 protected:
+	/**
+	 * \brief Returns the name of the default config file that should be read by
+	 *        the applications.
+	 */
 	virtual string      getDefaultConfigFile();
+	/**
+	 * \brief Returns the configuration object. 
+	 */
 	Ref<Config>         config() { return config_; }
+	/**
+	 * \brief Sets the configuration object.
+	 *
+	 * \param cfg the configuration object
+	 */
 	void                setConfig(Ref<Config> cfg) { config_ = cfg; }
 	
+	/**
+	 * \brief Returns command-line options.
+	 */
 	Options&            options() { return options_; }
+	/**
+	 * \brief Returns positional command-line arguments.
+	 */
 	Options::Arguments& args() { return options_.args(); }
 	
+	/**
+	 * \brief Get the output object (stdout by default).
+	 */
 	Ref<Output>         output() { return output_; }
+	/**
+	 * \brief Set the output object.
+	 */
 	void                setOutput(Ref<Output> output) { output_ = output; }
 	
+	/**
+	 * \brief Prints the command-line usage to the given stream.
+	 *
+	 * This method is aware of the command-line options set through the
+	 * \ref Options object (see \ref options()).
+	 *
+	 * \param out output stream to print the usage to
+	 */
 	virtual void        printUsage(std::ostream& out);
+	/**
+	 * \brief Reads the configuration file.
+	 *
+	 * This method is made virtual protected so that it can be overriden
+	 * in a subclass.
+	 */
 	virtual void        readConfig();
+	/**
+	 * \brief Sets up command line options and does whatever initialization
+	 *        is necessary before executing the application.
+	 *
+	 * This method is meant to be overriden in a subclass
+	 * to do custom initialization.
+	 */
 	virtual void        setUp();
+	/**
+	 * \brief Performs the main application work.
+	 *
+	 * This method is meant to be overriden in a subclass.
+	 *
+	 * \returns the exit code for the process
+	 */
 	virtual int         onRun();
 
 public:
 	AppBase();
+	/**
+	 * \brief Constructor.
+	 *
+	 * \param readConfig if \c true, the class will attempt to read a config file
+	 *                   specified by either command-line option or the default one
+	 *                   given by \ref getDefaultConfigFile()
+	 */
 	AppBase(bool readConfig);
 	virtual ~AppBase() {}
 	
 	/**
-	 * Executes the application in the current thread.
+	 * \brief Executes the application in the current thread.
+	 *
+	 * \param argc number of command-line arguments
+	 * \param argv array of C-strings containing the command-line arguments
+	 * \returns exit code
 	 */
 	int run(int argc, char* argv[]);
 };

@@ -121,7 +121,7 @@ bool JSONParser::readKeyValue(Ref<DynString> *key, Ref<DynObject> *value)
 {
 	Ref<DynObject> k;
 	
-	if (!readString(&k))
+	if (!(readString(&k) || readKeyword(&k)))
 		return false;
 	
 	if (k->isError()) {
@@ -219,6 +219,26 @@ bool JSONParser::readString(Ref<DynObject> *result)
 			break;
 		}
 	}
+	
+	return true;
+}
+
+
+bool JSONParser::readKeyword(Ref<DynObject> *result)
+{
+	skipWhitespace();
+	
+	TextLoc loc = lexer.getLocation();
+	std::ostringstream oss;
+	
+	if (!(isalpha(lexer.peek()) || lexer.peek() == '_'))
+		return false;
+	
+	while (isalnum(lexer.peek()) || lexer.peek() == '_') {
+		oss.put(lexer.read());
+	}
+	
+	*result = new DynString(loc, oss.str());
 	
 	return true;
 }
