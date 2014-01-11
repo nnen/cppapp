@@ -1,5 +1,5 @@
 /**
- * \file   leela/Object.h
+ * \file   Object.h
  * \author Jan Milík <milikjan@fit.cvut.cz>
  * \date   2011-03-27
  *
@@ -24,6 +24,21 @@ namespace cppapp {
 #define DEAD_SENTINEL 31415
 
 
+/**
+ * \defgroup obj Object System
+ */
+
+
+/**
+ * \brief Represents an item in a ring (circular double-linked list).
+ *
+ * Originally, this was supposed to be used to implement a ring
+ * that would keep references to all allocated \ref Objects
+ * so that memory leaks could be detected. Currently, it is not
+ * used however.
+ *
+ * \ingroup obj
+ */
 template<class T>
 struct RingItem {
 private:
@@ -68,7 +83,7 @@ public:
 
 
 /**
- * Represents a reference-counted object.
+ * \brief Represents a reference-counted object.
  *
  * \note Instances of classes derived from Object may not be allocated on stack. For example:
  *
@@ -82,6 +97,8 @@ public:
  *     // throws assertion exception here if compiled without NDEBUG
  * }
  * \endcode
+ *
+ * \ingroup obj
  */
 class Object {
 private:
@@ -89,17 +106,43 @@ private:
 	int sentinel_;
 
 public:
+	/**
+	 * \brief Constructor
+	 */
 	Object();
+	/**
+	 * \brief Destructor
+	 */
 	virtual ~Object();
-
+	
+	/**
+	 * \brief Increments object's reference count.
+	 */
 	void claim();
+	/**
+	 * \brief Attempts to detect whether this is actual live instance.
+	 */
 	void checkHealth() const;
+	/**
+	 * \brief Decreases object's reference count and frees the object
+	 *        if the ref count reached 0.
+	 *
+	 * \param obj Object to be released.
+	 */
 	static Object* release(Object* obj);
 	
+	/**
+	 * \brief Frees all allocated objects. <b>Not implemented</b>.
+	 *
+	 * \deprecated This method hasn't been implemented.
+	 */
 	static void deleteAll();
 };
 
 
+/**
+ * \ingroup obj 
+ */
 template<class T>
 class Box : public Object {
 private:
@@ -118,6 +161,9 @@ public:
 };
 
 
+/**
+ * \ingroup obj
+ */
 template<class T>
 class HeapBox : public Object {
 private:
@@ -136,6 +182,11 @@ public:
 };
 
 
+/**
+ * \brief Exception thrown when null \ref Ref reference is accessed.
+ *
+ * \ingroup obj
+ */
 class NullReferenceException : public std::exception {
 public:
 	NullReferenceException() throw() : std::exception() {}
@@ -147,6 +198,11 @@ public:
 };
 
 
+/**
+ * \brief Exception thrown when dynamic cast fails.
+ *
+ * \ingroup obj
+ */
 class InvalidCastException : public std::exception {
 public:
 	InvalidCastException() throw() : std::exception() {}
@@ -162,6 +218,11 @@ template<class T>
 class BRef;
 
 
+/**
+ * \brief Represents a reference (smart pointer) to an instance of \ref Object or derived class.
+ *
+ * \ingroup obj
+ */
 template<class T>
 class Ref {
 private:
@@ -180,24 +241,36 @@ private:
 	}
 
 public:
+	/**
+	 * \brief Default constructor. Initializes reference to \c NULL.
+	 */
 	Ref()
 	{
 		ptr_ = NULL;
 		setPtr(NULL);
 	}
 	
+	/**
+	 * \brief Pointer constructor. Claims object (see \ref Object::claim()).
+	 */
 	Ref(T* ptr)
 	{
 		ptr_ = NULL;
 		setPtr(ptr);
 	}
 	
+	/**
+	 * \brief Copy constructor.
+	 */
 	Ref(const Ref<T>& ref)
 	{
 		ptr_ = NULL;
 		setPtr(ref.getPtr());
 	}
 	
+	/**
+	 * \brief Destructor. Releases object (see \ref Object:release()).
+	 */
 	~Ref()
 	{
 		setPtr(NULL);
@@ -287,7 +360,15 @@ public:
 	}
 	*/
 	
+	/**
+	 * \brief Returns \c true if the reference is \c NULL
+	 *        (doesn't point to any object), \c false otherwise.
+	 */
 	bool isNull() const { return ptr_ == NULL; }
+	/**
+	 * \brief Return \c true if the reference is not \c NULL
+	 *        (points to an object), \c false otherwise.
+	 */
 	bool isNotNull() const { return !isNull(); }
 	
 	T* getPtr() const
@@ -307,6 +388,11 @@ public:
 typedef Ref<Object> ObjRef;
 
 
+/**
+ * \brief Like \ref Ref, except it references \ref Box instances.
+ *
+ * \ingroup obj
+ */
 template<class T>
 class BRef {
 private:

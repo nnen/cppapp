@@ -1,5 +1,5 @@
 /**
- * \file   leela/Object.cpp
+ * \file   Object.cpp
  * \author Jan Milík <milikjan@fit.cvut.cz>
  * \date   2011-03-27
  *
@@ -41,6 +41,12 @@ void Object::claim()
 }
 
 
+/**
+ * This method checks reference count (for live objects, ref count should 
+ * be greater or equal to 0) and the sentinel (\c int value in the object
+ * that set to a defined value in live objects and different value in
+ * dead objects).
+ */
 void Object::checkHealth() const
 {
 	CPPAPP_ASSERT(refCount_ >= 0);

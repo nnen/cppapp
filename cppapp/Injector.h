@@ -19,10 +19,11 @@
 namespace cppapp {
 
 
+/**
+ * \defgroup di Dependency Injection
+ * \brief Simple dependency injection system.
+ */
 /** \addtogroup di
- *
- * \brief Dependency injection
- *
  * @{
  */
 
