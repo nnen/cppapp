@@ -323,9 +323,8 @@ bool DynBoolean::parse(Lexer *lexer, bool *result)
 
 bool DynBoolean::parse(std::string str, bool *result)
 {
-	std::istringstream in(str);
 	Lexer lexer;
-	lexer.input(&in, "<string>");
+	lexer.input(str);
 	
 	if (!parse(&lexer, result))
 		return false;
@@ -355,8 +354,12 @@ bool DynNumber::parse(Lexer *lexer, double *result)
 	
 	lexer->skipWhitespace();
 	
-	if (!isdigit(lexer->peek()))
+	if (!(isdigit(lexer->peek()) || lexer->peek() == '-'))
 		return false;
+	
+	bool negative = false;
+	if (lexer->read('-'))
+		negative = true;
 	
 	while (isdigit(lexer->peek())) {
 		*result *= 10.0;
@@ -372,15 +375,17 @@ bool DynNumber::parse(Lexer *lexer, double *result)
 		}
 	}
 	
+	if (negative)
+		*result = -*result;
+	
 	return true;
 }
 
 
 bool DynNumber::parse(std::string str, double *result)
 {
-	std::istringstream in(str);
 	Lexer lexer;
-	lexer.input(&in, "<string>");
+	lexer.input(str);
 	
 	if (!parse(&lexer, result))
 		return false;

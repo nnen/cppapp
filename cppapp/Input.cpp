@@ -100,5 +100,59 @@ bool FileInput::hasExtension(string fileName, string extension)
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// STREAM INPUT
+///////////////////////////////////////////////////////////////////////////////
+
+
+StreamInput::StreamInput(std::string name, std::istream *stream, bool ownsStream) :
+	name_(name), stream_(stream), ownsStream_(ownsStream)
+{
+}
+
+
+StreamInput::StreamInput(std::string name, std::istream *stream) :
+	name_(name), stream_(stream), ownsStream_(true)
+{
+}
+
+
+StreamInput::StreamInput(std::string name, std::istream &stream) :
+	name_(name), stream_(&stream), ownsStream_(false)
+{
+}
+
+
+StreamInput::StreamInput(std::string name, std::string str) :
+	name_(name), stream_(new stringstream(str)), ownsStream_(true)
+{
+}
+
+
+StreamInput::StreamInput(std::string str) :
+	name_("<string>"), stream_(new stringstream(str)), ownsStream_(true)
+{
+}
+
+
+StreamInput::~StreamInput()
+{
+	if (ownsStream_ && (stream_ != NULL)) {
+		//stream_->close();
+		delete stream_;
+	}
+	
+	stream_     = NULL;
+	ownsStream_ = false;
+}
+
+
+void StreamInput::close()
+{
+	//if (ownsStream_ && (stream_ != NULL))
+	//	stream_->close();
+}
+
+
 } // namespace cppapp
 

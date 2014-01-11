@@ -63,6 +63,46 @@ public:
 RUN_SUITE(DynObjectTest);
 
 
+class DynNumberTest : public TestCase {
+public:
+	DynNumberTest()
+	{
+		TEST_ADD(DynNumberTest, testParse00);
+	}
+	
+	void testParse00()
+	{
+		double result = 0.0;
+		TEST_ASSERT(DynNumber::parse("1", &result), "string should be parsed");
+		TEST_EQUALS(1, result, "result should be 1");
+		
+		result = 0.0;
+		TEST_ASSERT(DynNumber::parse("-1", &result), "string should be parsed");
+		TEST_EQUALS(-1, result, "result should be 1");
+
+		result = 0.0;
+		TEST_ASSERT(DynNumber::parse("1234", &result), "string should be parsed");
+		TEST_EQUALS(1234, result, "result should be 1");
+		
+		result = 0.0;
+		TEST_ASSERT(DynNumber::parse("-1234", &result), "string should be parsed");
+		TEST_EQUALS(-1234, result, "result should be 1");
+		
+		result = 0.0;
+		TEST_ASSERT(DynNumber::parse("1234.12", &result), "string should be parsed");
+		TEST_EQUALS(1234.12, result, "result should be 1");
+		
+		result = 0.0;
+		TEST_ASSERT(DynNumber::parse("-1234.12", &result), "string should be parsed");
+		TEST_EQUALS(-1234.12, result, "result should be 1");
+		
+		// TEST_ASSERT(!DynNumber::parse("-", &result), "string should not be parsed");
+	}
+};
+
+RUN_SUITE(DynNumberTest);
+
+
 class DynStringTest : public TestCase {
 public:
 	DynStringTest()

@@ -27,10 +27,8 @@ public:
 	
 	void testLexer()
 	{
-		Lexer         lexer;
-		istringstream in("{:}");
-		
-		lexer.input(&in, "<string>");
+		Lexer lexer;
+		lexer.input("{:}");
 		
 		TEST_ASSERT(lexer.read('{'), "lookahead character is not what is expected");
 		TEST_ASSERT(lexer.read(':'), "lookahead character is not what is expected");
@@ -160,7 +158,8 @@ public:
 	
 	void testParseComplex()
 	{
-		istringstream iss(
+		JSONParser parser;
+		Ref<DynObject> result = parser.parse(
 			"{\n"
 			"	\"first\": 1,\n"
 			"	\"second\": {},\n"
@@ -171,27 +170,20 @@ public:
 			"	},\n"
 			"}\n"
 		);
-		JSONParser parser;
-		
-		Ref<DynObject> result = parser.parse(&iss, "<string>");
 		TEST_ASSERT(result->isDict(), "the result is not a DynDict");
 	}
 	
 	void testParseEmptyDict00()
 	{
-		istringstream iss("{}");
 		JSONParser parser;
-		
-		Ref<DynObject> result = parser.parse(&iss, "<string>");
+		Ref<DynObject> result = parser.parse("{}");
 		TEST_ASSERT(result->isDict(), "the result is not a JSONDict as expected");
 	}
 	
 	void testParseEmptyDict01()
 	{
-		istringstream iss("{");
 		JSONParser parser;
-		
-		Ref<DynObject> result = parser.parse(&iss, "<string>");
+		Ref<DynObject> result = parser.parse("{");
 		TEST_ASSERT(result->isError(),
 				  "the result is not a JSONError as expected");
 
@@ -199,40 +191,32 @@ public:
 	
 	void testParseEmptyList00()
 	{
-		istringstream iss("[]");
 		JSONParser parser;
-		
-		Ref<DynObject> result = parser.parse(&iss, "<string>");
+		Ref<DynObject> result = parser.parse("[]");
 		TEST_ASSERT(result->isList(),
 				  "the result is not a JSONList as expected");
 	}
 	
 	void testParseEmptyList01()
 	{
-		istringstream iss("[");
 		JSONParser parser;
-		
-		Ref<DynObject> result = parser.parse(&iss, "<string>");
+		Ref<DynObject> result = parser.parse("[");
 		TEST_ASSERT(result->isError(),
 				  "the result is not a JSONError as expected");
 	}
 	
 	void testParseEmptyString00()
 	{
-		istringstream iss("\"\"");
 		JSONParser parser;
-		
-		Ref<DynObject> result = parser.parse(&iss, "<string>");
+		Ref<DynObject> result = parser.parse("\"\"");
 		TEST_ASSERT(result->isString(),
 				  "the result is not a JSONString as expected");
 	}
 	
 	void testParseEmptyString01()
 	{
-		istringstream iss("\"");
 		JSONParser parser;
-		
-		Ref<DynObject> result = parser.parse(&iss, "<string>");
+		Ref<DynObject> result = parser.parse("\"");
 		TEST_ASSERT(result->isError(),
 				  "the result is not a JSONError as expected");
 	}
@@ -240,10 +224,8 @@ public:
 	
 	void testParseNumber(const char *json, double value)
 	{
-		istringstream iss(json);
 		JSONParser parser;
-		
-		Ref<DynObject> result = parser.parse(&iss, "<string>");
+		Ref<DynObject> result = parser.parse(json);
 		TEST_ASSERT(result->isNum(), "the result is not a JSONNumber as expected");
 		Ref<DynNumber> number = result;
 		TEST_EQUALS(value, number->getValue(), "the value of the json number is not 0 as expected");
@@ -260,10 +242,8 @@ public:
 	
 	void testParseBool(const char *json, bool value)
 	{
-		istringstream iss(json);
 		JSONParser parser;
-		
-		Ref<DynObject> result = parser.parse(&iss, "<string>");
+		Ref<DynObject> result = parser.parse(json);
 		TEST_ASSERT(result->isBool(), "the result is not a JSONNumber as expected");
 		Ref<DynBoolean> number = result;
 		TEST_EQUALS(value, number->getValue(), "the value of the json bool is not what was expected");
@@ -279,10 +259,8 @@ public:
 	
 	void testParseDict()
 	{
-		istringstream iss("{\"value\": 12, \"some_list\": [1, 2, 3]}");
 		JSONParser parser;
-		
-		Ref<DynObject> result = parser.parse(&iss, "<string>");
+		Ref<DynObject> result = parser.parse("{\"value\": 12, \"some_list\": [1, 2, 3]}");
 		TEST_ASSERT(result->isDict(), "the result is not a JSONDict as expected");
 		
 		Ref<DynDict> dict = result;
@@ -296,10 +274,8 @@ public:
 
 	void testParseComment()
 	{
-		istringstream iss("// some comment\n// 13\n10");
 		JSONParser parser;
-		
-		Ref<DynObject> result = parser.parse(&iss, "<string>");
+		Ref<DynObject> result = parser.parse("// some comment\n// 13\n10");
 		TEST_ASSERT(result->isNum(), "the result is not a JSONNumber as expected");
 		
 		TEST_EQUALS(10, result->getInt(), "the result does not have the expected value");

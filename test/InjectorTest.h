@@ -26,7 +26,7 @@ public:
 };
 
 
-Ref<DIObject> testCreate(Ref<DynObject> config)
+Ref<DIObject> testCreate(Ref<DynObject> config, Ref<DIObject> parent)
 {
 	return new DITestObjectA();
 }
@@ -61,7 +61,10 @@ public:
 	{
 		Injector::getInstance().clear();
 		
-		istringstream json(
+		CPPAPP_DI_FUNCTION("test.testFactory", testCreate);
+		
+		JSONParser parser;
+		Ref<DynObject> config = parser.parse(
 			"["
 			"	{"
 			"		\"key\":     \"test.testPlan\","
@@ -69,11 +72,6 @@ public:
 			"	},"
 			"]"
 		);
-		
-		CPPAPP_DI_FUNCTION("test.testFactory", testCreate);
-		
-		JSONParser parser;
-		Ref<DynObject> config = parser.parse(&json, "<string>");
 		TEST_ASSERT(config.isNotNull(), "the config should not be null");
 		
 		Injector::getInstance().makePlans(config);
@@ -90,7 +88,10 @@ public:
 	{
 		Injector::getInstance().clear();
 		
-		istringstream json(
+		CPPAPP_DI_FUNCTION("test.testFactory", testCreate);
+		
+		JSONParser parser;
+		Ref<DynObject> config = parser.parse(
 			"["
 			"	{"
 			"		\"key\":     \"test.testPlan01\","
@@ -102,11 +103,6 @@ public:
 			"	},"
 			"]"
 		);
-		
-		CPPAPP_DI_FUNCTION("test.testFactory", testCreate);
-		
-		JSONParser parser;
-		Ref<DynObject> config = parser.parse(&json, "<string>");
 		TEST_ASSERT(config.isNotNull(), "the config should not be null");
 		
 		Injector::getInstance().makePlans(config);

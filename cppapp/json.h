@@ -76,6 +76,10 @@ public:
 	 * \param input \ref Input instance to read the input from
 	 */
 	Ref<DynObject> parse(Ref<Input> input);
+	/**
+	 * \brief Parse a single JSON value read from an STL string.
+	 */
+	Ref<DynObject> parse(std::string input);
 };
 
 

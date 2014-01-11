@@ -139,6 +139,31 @@ public:
 };
 
 
+/**
+ * \brief Represents an input read from a string.
+ */
+class StreamInput : public Input {
+private:
+	std::string   name_;
+	std::istream *stream_;
+	bool          ownsStream_;
+
+public:
+	StreamInput(std::string name, std::istream *stream, bool ownsStream);
+	StreamInput(std::string name, std::istream *stream);
+	StreamInput(std::string name, std::istream &stream);
+	StreamInput(std::string name, std::string str);
+	StreamInput(std::string str);
+	virtual ~StreamInput();
+	
+	virtual std::string getName() { return name_; }
+	
+	virtual istream* getStream() { return stream_; }
+	
+	virtual void close();
+};
+
+
 } // namespace cppapp
 
 

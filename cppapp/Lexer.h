@@ -17,16 +17,18 @@
 #include <vector>
 
 #include "TextLoc.h"
+#include "Input.h"
 
 
 namespace cppapp {
 
 
 /**
- * \todo Write documentation for class Lexer.
+ * \brief Simple stream lexer to make parsing easier.
  */
 class Lexer {
 private:
+	Ref<Input>    inputObj_;
 	std::istream *input_;
 	
 	TextLoc           loc_;
@@ -44,8 +46,9 @@ public:
 	 * Constructor.
 	 */
 	Lexer();
-
-	void input(std::istream *in, std::string fileName);
+	
+	void input(Ref<Input> in);
+	void input(std::string str);
 	
 	TextLoc getLocation() const { return loc_; }
 	

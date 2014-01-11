@@ -18,11 +18,18 @@ Lexer::Lexer() :
 }
 
 
-void Lexer::input(std::istream *in, std::string fileName)
+void Lexer::input(Ref<Input> in)
 {
-	input_ = in;
-	loc_   = TextLoc(fileName);
+	inputObj_ = in;
+	input_    = in->getStream();
+	loc_      = TextLoc(in->getName());
 	buffer_.clear();
+}
+
+
+void Lexer::input(std::string str)
+{
+	input(new StreamInput(str));
 }
 
 

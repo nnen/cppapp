@@ -286,7 +286,13 @@ bool JSONParser::readNull(Ref<DynObject> *result)
 
 Ref<DynObject> JSONParser::parse(std::istream *input, std::string fileName)
 {
-	lexer.input(input, fileName);
+	return parse(new StreamInput(fileName, input));
+}
+
+
+Ref<DynObject> JSONParser::parse(Ref<Input> input)
+{
+	lexer.input(input);
 	
 	Ref<DynObject> result;
 	if (!readObject(&result))
@@ -296,9 +302,9 @@ Ref<DynObject> JSONParser::parse(std::istream *input, std::string fileName)
 }
 
 
-Ref<DynObject> JSONParser::parse(Ref<Input> input)
+Ref<DynObject> JSONParser::parse(std::string input)
 {
-	return parse(input->getStream(), input->getName());
+	return parse(new StreamInput(input));
 }
 
 
