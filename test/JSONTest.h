@@ -235,6 +235,7 @@ public:
 	{
 		testParseNumber("0", 0.0);
 		testParseNumber("1", 1.0);
+		testParseNumber("-1", -1.0);
 		testParseNumber("0.1", 0.1);
 		testParseNumber("0.12345", 0.12345L);
 		testParseNumber("12345.12", 12345.12L);

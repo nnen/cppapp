@@ -246,7 +246,7 @@ bool JSONParser::readKeyword(Ref<DynObject> *result)
 
 bool JSONParser::readNumber(Ref<DynObject> *result)
 {
-	if (!isdigit(lexer.peek()))
+	if (!(isdigit(lexer.peek()) || lexer.peek() == '-'))
 		return false;
 	
 	TextLoc loc = lexer.getLocation();
