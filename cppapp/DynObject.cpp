@@ -143,6 +143,12 @@ std::string DynObject::getStrString(std::string key, std::string defaultValue)
 }
 
 
+Ref<DynObject> DynObject::getKeys()
+{
+	return DYN_NEW_LIST;
+}
+
+
 bool DynObject::equals(Ref<DynObject> other) const
 {
 	if (this == other.getPtr())
@@ -222,6 +228,18 @@ Ref<DynObject> DynDict::getStrItem(std::string key, Ref<DynObject> deflt)
 void DynDict::setStrItem(std::string key, Ref<DynObject> value)
 {
 	_values[key] = value;
+}
+
+
+Ref<DynObject> DynDict::getKeys()
+{
+	VAR(result, DYN_NEW_LIST);
+	
+	FOR_EACH(_values, it) {
+		result->append(DYN_NEW_STRING(it->first));
+	}
+	
+	return result;
 }
 
 

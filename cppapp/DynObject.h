@@ -72,6 +72,10 @@ public:
 	
 	virtual int getSize() const { return 0; }
 	
+	/**
+	 * \name Subscription Protocol
+	 */
+	///@{
 	virtual bool            hasStrItem(std::string key) { return false; }
 	virtual Ref<DynObject>  getStrItem(std::string key, Ref<DynObject> deflt);
 	virtual Ref<DynObject>  getStrItem(std::string key) { return getStrItem(key, NULL); }
@@ -93,15 +97,27 @@ public:
 	virtual double          getStrDouble(std::string key, double defaultValue);
 	virtual std::string     getStrString(std::string key, std::string defaultValue);
 	
+	virtual Ref<DynObject>  getKeys();
+	///@}
+	
 	virtual bool equals(Ref<DynObject> other) const;
 	
+	/**
+	 * \name Iteration Protocol
+	 */
+	///@{
 	virtual Ref<DynObject> getIterator() { return this; }
 	virtual Ref<DynObject> getNext();
+	///@}
 	
 	virtual Ref<DynBoolean> toBool();
 	virtual Ref<DynNumber>  toNum();
 	virtual Ref<DynString>  toString();
 	
+	/**
+	 * \name C Type Conversion
+	 */
+	///@{
 	virtual bool        getBool() const   { return true; }
 	virtual double      getDouble() const { return 0; }
 	virtual int         getInt() const    { return (int)getDouble(); }
@@ -111,6 +127,7 @@ public:
 	operator double()      { return getDouble(); }
 	operator int()         { return getInt(); }
 	operator std::string() { return getString(); }
+	///@}
 };
 
 
@@ -151,6 +168,8 @@ public:
 	virtual bool           hasStrItem(std::string key);
 	virtual Ref<DynObject> getStrItem(std::string key, Ref<DynObject> deflt);
 	virtual void           setStrItem(std::string key, Ref<DynObject> value);
+	
+	virtual Ref<DynObject> getKeys();
 	
 	void update(Ref<DynDict> dict)
 	{
@@ -215,6 +234,9 @@ public:
 	
 	virtual Ref<DynObject> getNext();
 };
+
+
+#define DYN_NEW_LIST (new cppapp::DynList(TextLoc(__FILE__, __LINE__)))
 
 
 //// DynScalar //////////////////////////////////////////////////////
@@ -302,6 +324,9 @@ public:
 	virtual double getDouble() const;
 	virtual std::string getString() const { return getValue(); }
 };
+
+
+#define DYN_NEW_STRING(value) (new cppapp::DynString(TextLoc(__FILE__, __LINE__), (value)))
 
 
 //// DynNull ////////////////////////////////////////////////////////

@@ -22,6 +22,7 @@
 #include "Object.h"
 #include "Options.h"
 #include "Output.h"
+#include "Path.h"
 #include "Stopwatch.h"
 #include "Thread.h"
 #include "Test.h"

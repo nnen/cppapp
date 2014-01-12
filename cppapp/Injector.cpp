@@ -13,6 +13,34 @@ namespace cppapp {
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// DIAdvancedObject
+////////////////////////////////////////////////////////////////////////////////
+
+
+void DIAdvancedObject::addDIProperty(Ref<DIAbstractProperty> property)
+{
+	CPPAPP_ASSERT(property.isNotNull());
+	properties_[property->getName()] = property;
+}
+
+
+bool DIAdvancedObject::injectDependency(Ref<DIObject> obj, std::string key)
+{
+	Ref<DIAbstractProperty> prop = properties_[key];
+	if (prop.isNull())
+		return false;
+	
+	return prop->set(obj);
+}
+
+
+void DIAdvancedObject::diConfig(Injector &injector, Ref<DynObject> config)
+{
+	
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // DIFactory
 ////////////////////////////////////////////////////////////////////////////////
 

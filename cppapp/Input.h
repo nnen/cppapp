@@ -33,6 +33,8 @@ namespace cppapp {
  *
  * \param   path a file path
  * \returns      basename part of a path
+ *
+ * \deprecated Use \ref Path::basename().
  */
 string pathBasename(const string &path);
 /**

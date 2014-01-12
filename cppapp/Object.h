@@ -131,6 +131,8 @@ public:
 	 */
 	static Object* release(Object* obj);
 	
+	std::string getClassName();
+	
 	/**
 	 * \brief Frees all allocated objects. <b>Not implemented</b>.
 	 *

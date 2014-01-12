@@ -68,6 +68,28 @@ Object* Object::release(Object* obj)
 }
 
 
+std::string Object::getClassName()
+{
+	const char *mangled = typeid(*this).name();
+	int status = 0;
+	size_t length = 0;
+	char *result = abi::__cxa_demangle(
+		mangled,
+		NULL,
+		&length,
+		&status
+	);
+	
+	std::string str;
+	if (status == 0)
+		str = std::string(result);
+	else
+		str = std::string(mangled);
+	
+	return str;
+}
+
+
 void Object::deleteAll()
 {
 }

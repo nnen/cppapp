@@ -67,6 +67,110 @@ public:
 };
 
 
+//// DIAdvanceObject ////////////////////////////////////////////////
+
+
+class DIAbstractProperty : public Object {
+protected:
+	std::string name_;
+	bool        required_;
+
+public:
+	DIAbstractProperty(std::string name, bool required) :
+		name_(name), required_(required)
+	{}
+	
+	DIAbstractProperty(std::string name) :
+		name_(name), required_(false)
+	{}
+	
+	virtual ~DIAbstractProperty() {}
+	
+	virtual std::string getName() { return name_; }
+	virtual bool        isRequired() { return required_; }
+	
+	virtual bool set(Ref<DIObject> value) = 0;
+};
+
+
+template<class T, class U>
+class DIProperty : public DIAbstractProperty {
+public:
+	typedef void (U::*Method)(T value);
+
+private:
+	std::string  name_;
+	U           *obj_;
+	Method       method_;
+
+public:
+	DIProperty(std::string name, U *obj, Method method) :
+		name_(name), obj_(obj), method_(method)
+	{}
+	
+	virtual ~DIProperty() {}
+	
+	virtual bool set(Ref<DIObject> value)
+	{
+		LOG_ERROR("Failed to set DI property \"" << name_ << "\".");
+		return false;
+	}
+};
+
+
+template<class T, class U>
+class DIProperty<Ref<T>, U> : public DIAbstractProperty {
+public:
+	typedef void (U::*Method)(T value);
+
+private:
+	std::string  name_;
+	U           *obj_;
+	Method       method_;
+
+public:
+	DIProperty(std::string name, U obj, Method method) :
+		name_(name), obj_(obj), method_(method)
+	{}
+	
+	virtual ~DIProperty() {}
+	
+	virtual bool set(Ref<DIObject> value)
+	{
+		Ref<DynObject> obj = value.as<DynObject>();
+		if (obj.isNull()) {
+			LOG_ERROR(
+				"Failed to set DI property \"" << name_ <<
+				"\" - data type conversion failed. (" << value->getClassName() << ")."
+			);
+			return false;
+		}
+		
+		(obj_->*method_)(*value);
+		return true;
+	}
+};
+
+
+class Injector;
+
+
+class DIAdvancedObject : public DIObject {
+private:
+	std::map<std::string, Ref<DIAbstractProperty> > properties_;
+	
+protected:
+	void addDIProperty(Ref<DIAbstractProperty> property);
+	
+public:
+	virtual ~DIAdvancedObject() {}
+	
+	virtual bool injectDependency(Ref<DIObject> obj, std::string key);
+	
+	virtual void diConfig(Injector &injector, Ref<DynObject> config);
+};
+
+
 //// DIFactory //////////////////////////////////////////////////////
 
 
