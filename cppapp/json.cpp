@@ -46,7 +46,7 @@ void JSONParser::skipWhitespace()
 		if (!lexer.read("//"))
 			break;
 		
-		while (lexer.peek() != '\n')
+		while (lexer.peek() != '\n' && lexer.peek() >= 0)
 			lexer.read();
 	}
 }
@@ -89,6 +89,7 @@ bool JSONParser::readDict(Ref<DynObject> *result)
 	*result = dict;
 	
 	while(lexer.read(','));
+	skipWhitespace();
 	if (lexer.read('}'))
 		return true;
 	
@@ -128,7 +129,7 @@ bool JSONParser::readKeyValue(Ref<DynString> *key, Ref<DynObject> *value)
 		*value = k;
 		return true;
 	}
-
+	
 	*key = k;
 	
 	if (!lexer.read(':')) {

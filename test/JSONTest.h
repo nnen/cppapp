@@ -280,6 +280,18 @@ public:
 		TEST_ASSERT(result->isNum(), "the result is not a JSONNumber as expected");
 		
 		TEST_EQUALS(10, result->getInt(), "the result does not have the expected value");
+		
+		result = parser.parse(
+			"{"
+			"	// some comment\n"
+			"	\"key\": \"value\","
+			"}"
+		);
+		if (result->isError()) {
+			LOG_ERROR(result->getString());
+		}
+		TEST_ASSERT(result->isDict(), "the result should be a dict");
+		TEST_EQUALS(1, result->getSize(), "there should be one item in the dict");
 	}
 
 };

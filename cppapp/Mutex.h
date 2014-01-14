@@ -99,7 +99,9 @@ public:
 	
 	void lock()
 	{
+#ifdef CPPAPP_DEBUG
 		LOG_DEBUG("Locking mutex...");
+#endif
 		HANDLE_SYSERR(pthread_mutex_lock(&mutex_));
 	}
 	

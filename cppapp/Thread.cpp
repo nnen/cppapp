@@ -16,17 +16,23 @@ namespace cppapp {
 
 void* Thread::threadFunction(void *arg)
 {
+#ifdef CPPAPP_DEBUG
 	LOG_DEBUG("Thread started...");
+#endif
 	Thread *t = (Thread*)arg;
 	void *result = t->run();
+#ifdef CPPAPP_DEBUG
 	LOG_DEBUG("Returning from thread...");
+#endif
 	return result;
 }
 
 
 void Thread::exit(void *result)
 {
+#ifdef CPPAPP_DEBUG
 	LOG_DEBUG("Exiting thread...");
+#endif
 	pthread_exit(result);
 }
 
@@ -36,7 +42,9 @@ void Thread::exit(void *result)
  */
 Thread::Thread()
 {
+#ifdef CPPAPP_DEBUG
 	LOG_DEBUG("Starting thread...");
+#endif
 	HANDLE_SYSERR(pthread_create(&thread_, NULL, threadFunction, this))
 }
 
