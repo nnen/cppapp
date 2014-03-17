@@ -3,7 +3,12 @@
 *.swp
 libcppapp*.a
 cppapp*.tar.gz
+test/test
 
+docs
+
+*.pc
+Makefile
 .deps
 configure
 Makefile.in

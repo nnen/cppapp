@@ -36,7 +36,9 @@ string pathBasename(const string &path)
 
 string pathWithoutExtension(const string &path)
 {
-	int dotIndex = path.find_last_of(".");
+	std::size_t dotIndex = path.find_last_of(".");
+	if (dotIndex == string::npos)
+		return path;
 	return path.substr(0, dotIndex);
 }
 
@@ -95,6 +97,60 @@ bool FileInput::hasExtension(string fileName, string extension)
 	if (extension.size() > fileName.size()) return false;
 	
 	return (fileName.substr(fileName.size() - extension.size(), extension.size()) == extension);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// STREAM INPUT
+///////////////////////////////////////////////////////////////////////////////
+
+
+StreamInput::StreamInput(std::string name, std::istream *stream, bool ownsStream) :
+	name_(name), stream_(stream), ownsStream_(ownsStream)
+{
+}
+
+
+StreamInput::StreamInput(std::string name, std::istream *stream) :
+	name_(name), stream_(stream), ownsStream_(true)
+{
+}
+
+
+StreamInput::StreamInput(std::string name, std::istream &stream) :
+	name_(name), stream_(&stream), ownsStream_(false)
+{
+}
+
+
+StreamInput::StreamInput(std::string name, std::string str) :
+	name_(name), stream_(new stringstream(str)), ownsStream_(true)
+{
+}
+
+
+StreamInput::StreamInput(std::string str) :
+	name_("<string>"), stream_(new stringstream(str)), ownsStream_(true)
+{
+}
+
+
+StreamInput::~StreamInput()
+{
+	if (ownsStream_ && (stream_ != NULL)) {
+		//stream_->close();
+		delete stream_;
+	}
+	
+	stream_     = NULL;
+	ownsStream_ = false;
+}
+
+
+void StreamInput::close()
+{
+	//if (ownsStream_ && (stream_ != NULL))
+	//	stream_->close();
 }
 
 

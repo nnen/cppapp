@@ -16,15 +16,22 @@
 #include <vector>
 #include <map>
 #include <cstdlib>
+#include <unistd.h>
 
 #include "utils.h"
 #include "Config.h"
+#include "DynObject.h"
 
 
 using namespace std;
 
 
 namespace cppapp {
+
+
+/** \addtogroup app
+ * @{
+ */
 
 
 /**
@@ -117,6 +124,8 @@ struct Option {
 			config->set(ConfigValue::make(configKey, isSet));
 		}
 	}
+	
+	void setConfigKey(Ref<DynObject> config) const;
 };
 
 
@@ -126,6 +135,7 @@ struct Option {
 class Options {
 public:
 	typedef map<int, Option> Map;
+	typedef map<std::string, int> ConfigMap;
 	typedef vector<string> Arguments;
 
 private:
@@ -139,6 +149,8 @@ private:
 	Arguments   arguments;
 	string      executable;
 	bool        valid;
+	
+	ConfigMap   configKeys;
 	
 	void error(string message);
 	
@@ -165,6 +177,7 @@ public:
 	void parse(int argc, char *argv[]);
 	
 	Option& get(int opt);
+	Option& get(std::string configKey);
 	
 	Arguments& args() { return arguments; } 
 	string     getExecutable() const { return executable; }
@@ -175,10 +188,14 @@ public:
 	bool isValid() const { return valid; }
 	
 	void setConfigKeys(Ref<Config> config) const;
+	void setConfigKeys(Ref<DynObject> config) const;
 	
 	void printUsage(ostream& output);
 	void dump(ostream& output);
 };
+
+
+/** @} */
 
 
 } // namespace cppapp

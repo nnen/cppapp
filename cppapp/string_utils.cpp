@@ -10,3 +10,7 @@
 #include "string_utils.h"
 
 
+namespace cppapp {
+} // namespace cppapp
+
+

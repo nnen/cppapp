@@ -33,14 +33,19 @@ namespace cppapp {
  *
  * \param   path a file path
  * \returns      basename part of a path
+ *
+ * \deprecated Use \ref Path::basename().
  */
 string pathBasename(const string &path);
 /**
  * \brief Returns the entire path without the file extension.
  *
+ * If the path does not contain extension, the path itself is returned.
+ *
  * For example:
  * \code{.cpp}
  * pathWithoutExtension("/path/to/a.file"); // returns "/path/to/a"
+ * pathWithoutExtension("/path/to/file"); // returns "/path/to/file"
  * \endcode
  *
  * \param   path a file path
@@ -133,6 +138,31 @@ public:
 	{
 		return pathWithExtension(fileName_, extension);
 	}
+};
+
+
+/**
+ * \brief Represents an input read from a string.
+ */
+class StreamInput : public Input {
+private:
+	std::string   name_;
+	std::istream *stream_;
+	bool          ownsStream_;
+
+public:
+	StreamInput(std::string name, std::istream *stream, bool ownsStream);
+	StreamInput(std::string name, std::istream *stream);
+	StreamInput(std::string name, std::istream &stream);
+	StreamInput(std::string name, std::string str);
+	StreamInput(std::string str);
+	virtual ~StreamInput();
+	
+	virtual std::string getName() { return name_; }
+	
+	virtual istream* getStream() { return stream_; }
+	
+	virtual void close();
 };
 
 

@@ -7,6 +7,7 @@
  */
 
 #include "Config.h"
+#include "Logger.h"
 
 #include <cstdlib>
 
@@ -26,7 +27,7 @@ namespace cppapp {
  * Constructor.
  */
 ConfigValue::ConfigValue(string name, string rawValue) :
-	name_(name), rawValue_(trim(rawValue))
+	name_(name), rawValue_(Strings::trim(rawValue))
 {
 }
 
@@ -36,7 +37,7 @@ ConfigValue::ConfigValue(string name, string rawValue) :
  */
 bool ConfigValue::asBool() const
 {
-	string l = toLower(rawValue_);
+	string l = Strings::toLower(rawValue_);
 	
 	if ((l.compare("f") == 0) ||
 	    (l.compare("false") == 0) ||
@@ -106,7 +107,7 @@ Ref<ConfigValue> Config::get(const string &key)
 	if (it != values_.end()) return it->second;
 	
 	it = defaults_.find(key);
-	if (it != values_.end()) return it->second;
+	if (it != defaults_.end()) return it->second;
 	
 	return NULL;
 }
@@ -149,8 +150,8 @@ void Config::dump(ostream &output)
  */
 void ConfigParser::handleError()
 {
-	cerr << "ERROR: Error occured while reading configuration from " <<
-		input_->getName() << " on line " << loc_.line << "." << endl;
+	LOG_ERROR("Error occured while reading configuration from " <<
+			input_->getName() << " on line " << loc_.line << ".");
 	error_ = true;
 }
 
@@ -263,10 +264,17 @@ ConfigParser::ConfigParser(Ref<Config> config) :
 void ConfigParser::parse(Ref<Input> input)
 {
 	input_ = input;
-	loc_ = TextLoc();
+	loc_ = TextLoc2();
 	error_ = false;
 	key_ = "";
 	value_ = "";
+
+	if (!input->getStream()->good()) {
+		LOG_WARNING("Cannot read configuration from " <<
+				  input->getName() <<
+				  ". If the stream is a file, it may not exist.");
+		return;
+	}
 	
 	if (config_.isNull())
 		config_ = new Config();

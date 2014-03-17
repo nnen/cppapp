@@ -1,0 +1,86 @@
+#
+# C++ Makefile template
+#
+
+
+PROJECT_NAME = cppapp
+BIN_NAME     = libcppapp.a
+VERSION      = 0.2.1dev
+# yes / no
+IS_LIBRARY   = yes
+
+CPP_FILES    = $(shell ls cppapp/*.cpp)
+OBJECT_FILES = $(foreach CPP_FILE, $(CPP_FILES), $(patsubst %.cpp,%.o,$(CPP_FILE)))
+DEP_FILES    = $(foreach CPP_FILE, $(CPP_FILES), $(patsubst %.cpp,%.d,$(CPP_FILE)))
+
+DOCS_ARCH    = $(PROJECT_NAME)-$(VERSION)-docs.html.tar.gz
+
+CXX          = clang++
+CXXFLAGS     = -Wall -ggdb3 -O0
+LDFLAGS      =
+
+
+all: $(DEP_FILES)
+	$(MAKE) build
+
+
+-include $(DEP_FILES)
+
+
+build: $(BIN_NAME)
+
+
+docs:
+	@echo "========= GENERATING DOCS ========="
+	doxygen
+	cd docs/html; tar -czf ../../$(DOCS_ARCH) ./*
+
+
+clean-docs:
+	@echo "========= CLEANING DOCS ========="
+	rm -fR docs/html
+
+
+upload-docs:
+	@$(MAKE) docs
+	scp $(DOCS_ARCH) jan@milik.cz:public_html/cppapp
+	ssh -t jan@milik.cz "cd ~/public_html/cppapp/docs; tar -xzf ../$(DOCS_ARCH)"
+
+
+clean:
+	@echo "========= CLEANING ========="
+	rm -f $(OBJECT_FILES) $(BIN_NAME)
+	@$(MAKE) clean-docs
+	@echo
+
+
+rebuild:
+	$(MAKE) clean
+	$(MAKE) build
+
+
+deps: $(DEP_FILES)
+
+
+clean-deps:
+	rm -f $(DEP_FILES)
+
+
+$(BIN_NAME): $(OBJECT_FILES)
+ifeq ($(IS_LIBRARY),yes)
+	@echo "========= LINKING LIBRARY $@ ========="
+	$(AR) -r $@ $^
+else
+	@echo "========= LINKING EXECUTABLE $@ ========="
+	$(CXX) $(CXXFLAGS) -o $@ $^ 
+endif
+	@echo
+
+
+.PHONY: all build clean rebuild deps clean-deps docs
+
+
+%.d: %.cpp
+	$(CXX) $(CXXFLAGS) -MM -o $@ $<
+
+
