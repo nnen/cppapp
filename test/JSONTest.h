@@ -282,16 +282,17 @@ public:
 		TEST_EQUALS(10, result->getInt(), "the result does not have the expected value");
 		
 		result = parser.parse(
-			"{"
-			"	// some comment\n"
-			"	\"key\": \"value\","
+			"{\n"
+			"	\"first_key\": 10,\n"
+			"	// some comment,\n"
+			"	\"key\": \"value\",\n"
 			"}"
 		);
 		if (result->isError()) {
 			LOG_ERROR(result->getString());
 		}
 		TEST_ASSERT(result->isDict(), "the result should be a dict");
-		TEST_EQUALS(1, result->getSize(), "there should be one item in the dict");
+		TEST_EQUALS(2, result->getSize(), "there should be two items in the dict");
 	}
 
 };

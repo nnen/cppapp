@@ -104,11 +104,15 @@ bool JSONParser::readDict(Ref<DynObject> *result)
 		
 		dict->setItem(key, value);
 		
+		skipWhitespace();
 		if (!lexer.read(','))
 			break;
-		while (lexer.read(','));
+		skipWhitespace();
+		while (lexer.read(',')) {
+			skipWhitespace();
+		}
 	}
-
+	
 	if (!lexer.read('}')) {
 		*result = ERROR;
 		return true;
