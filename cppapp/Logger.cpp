@@ -143,7 +143,15 @@ void Logger::defaultConfig()
 
 void Logger::readConfig(Ref<DynObject> config)
 {
+	if (config.isNull()) {
+		return;
+	}
+	
 	if (config->isString()) {
+		LOG_DEBUG(
+			"Adding INFO logging output to " << config->getString() <<
+			"."
+			);
 		addOutput(LOG_LVL_INFO, config->getString());
 	} else if (config->isList()) {
 		Ref<DynObject> item;
@@ -154,6 +162,11 @@ void Logger::readConfig(Ref<DynObject> config)
 		std::string fileName = config->getStrString("file_name", "-");
 		std::string logLevelName = config->getStrString("log_level", "INFO");
 		LogLevel logLevel = logLevelFromString(logLevelName);
+		LOG_DEBUG(
+			"Adding " << logLevelToString(logLevel) <<
+			" logging output to " << fileName <<
+			"."
+			);
 		addOutput(logLevel, fileName);
 	} else {
 		LOG_ERROR("Cannot read logging configuration - expected dictionary, got: " << config->getTypeName());
