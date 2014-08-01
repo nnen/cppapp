@@ -58,6 +58,8 @@ public:
 	
 	virtual ~DynObject() {}
 	
+	virtual std::string getTypeName() const { return "DynObject"; }
+	
 	TextLoc getLocation() const { return location; }
 	
 	virtual void print(Ref<PrettyPrinter> printer, int level = 0);
@@ -159,6 +161,8 @@ public:
 	
 	virtual ~DynDict() { _values.clear(); }
 	
+	virtual std::string getTypeName() const { return "DynDict"; }
+	
 	virtual bool isDict() const { return true; }
 	
 	virtual int getSize() const { return _values.size(); }
@@ -201,6 +205,8 @@ public:
 	
 	virtual ~DynList() { _values.clear(); }
 	
+	virtual std::string getTypeName() const { return "DynList"; }
+	
 	virtual bool isList() const { return true; }
 	
 	virtual int getSize() const { return _values.size(); }
@@ -232,6 +238,8 @@ public:
 		list_(list)
 	{ }
 	
+	virtual std::string getTypeName() const { return "DynListIter"; }
+	
 	virtual Ref<DynObject> getNext();
 };
 
@@ -251,6 +259,8 @@ public:
 		DynObject(loc), _value(value)
 	{}
 	
+	virtual std::string getTypeName() const { return "DynScalar"; }
+	
 	T getValue() const { return _value; }
 	void setValue(T value) { _value = value; }
 };
@@ -263,6 +273,8 @@ public:
 	DynBoolean(TextLoc loc, bool value) :
 		DynScalar<bool>(loc, value)
 	{}
+	
+	virtual std::string getTypeName() const { return "DynBoolean"; }
 	
 	virtual void print(Ref<PrettyPrinter> printer, int level = 0);
 	
@@ -286,6 +298,8 @@ public:
 	DynNumber(TextLoc loc, double value) :
 		DynScalar<double>(loc, value)
 	{}
+	
+	virtual std::string getTypeName() const { return "DynNumber"; }
 	
 	virtual void print(Ref<PrettyPrinter> printer, int level = 0);
 	
@@ -313,6 +327,8 @@ public:
 	DynString(TextLoc loc, std::string value) :
 		DynScalar<std::string>(loc, value)
 	{}
+
+	virtual std::string getTypeName() const { return "DynString"; }
 	
 	virtual void print(Ref<PrettyPrinter> printer, int level = 0);
 	
@@ -333,6 +349,8 @@ public:
 
 class DynNull : public DynObject {
 public:
+	virtual std::string getTypeName() const { return "DynNull"; }
+	
 	virtual bool isNull() const { return true; }
 	
 	virtual bool getBool() const { return false; }
@@ -354,6 +372,8 @@ public:
 	DynError(TextLoc loc, std::string message, TextLoc errorLoc) :
 		DynObject(loc), message_(message), errorLoc_(errorLoc)
 	{}
+
+	virtual std::string getTypeName() const { return "DynError"; }
 	
 	virtual bool isError() const { return true; }
 	virtual TextLoc getErrorLoc() const { return errorLoc_; }

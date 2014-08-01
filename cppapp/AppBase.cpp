@@ -73,6 +73,7 @@ void AppBase::setUp()
 			    "OUTPUT_FILE",
 			    CPPAPP_OUTPUT_FILE_CFG_KEY,
 			    "Write output to file OUTPUT_FILE.");
+	
 	options().add('h', "", "Print this help.");
 }
 

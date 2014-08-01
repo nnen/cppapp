@@ -57,6 +57,11 @@ using namespace std;
 namespace cppapp {
 
 
+// This symbol is defined in "DynObject.h".
+// Cannot simply include because of circular dependencies.
+class DynObject;
+
+
 /**
  * \brief Enumeration of the logging levels used by Logger. 
  */
@@ -134,8 +139,11 @@ public:
 	static void defaultConfig(string fileName);
 	static void defaultConfig();
 	
+	static void readConfig(Ref<DynObject> config);
+	
 	static vector<string> getBacktrace();
 	
+	static LogLevel logLevelFromString(std::string value);
 	
 	struct Entry {
 		string fileName;

@@ -11,6 +11,7 @@
 #include <cstdlib>
 
 #include "Logger.h"
+#include "DynObject.h"
 
 
 namespace cppapp {
@@ -140,6 +141,26 @@ void Logger::defaultConfig()
 }
 
 
+void Logger::readConfig(Ref<DynObject> config)
+{
+	if (config->isString()) {
+		addOutput(LOG_LVL_INFO, config->getString());
+	} else if (config->isList()) {
+		Ref<DynObject> item;
+		DYN_FOR_EACH(item, config) {
+			readConfig(item);
+		}
+	} else if (config->isDict()) {
+		std::string fileName = config->getStrString("file_name", "-");
+		std::string logLevelName = config->getStrString("log_level", "INFO");
+		LogLevel logLevel = logLevelFromString(logLevelName);
+		addOutput(logLevel, fileName);
+	} else {
+		LOG_ERROR("Cannot read logging configuration - expected dictionary, got: " << config->getTypeName());
+	}
+}
+
+
 vector<string> Logger::getBacktrace()
 {
 	void* buffer[30];
@@ -159,6 +180,23 @@ vector<string> Logger::getBacktrace()
 	free(strings);
 	
 	return result;
+}
+
+
+LogLevel Logger::logLevelFromString(std::string value)
+{
+	if (Strings::toLower(value).compare("none") == 0) {
+		return LOG_LVL_NONE;
+	} else if (Strings::toLower(value).compare("error") == 0) {
+		return LOG_LVL_ERROR;
+	} else if (Strings::toLower(value).compare("warning") == 0) {
+		return LOG_LVL_WARNING;
+	} else if (Strings::toLower(value).compare("info") == 0) {
+		return LOG_LVL_INFO;
+	} else if (Strings::toLower(value).compare("debug") == 0) {
+		return LOG_LVL_DEBUG;
+	}
+	return LOG_LVL_NONE;
 }
 
 
