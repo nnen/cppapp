@@ -12,6 +12,7 @@
 #include "Debug.h"
 #include "AppBase.h"
 #include "Config.h"
+#include "Channel.h"
 #include "DynObject.h"
 #include "Exception.h"
 #include "Injector.h"
