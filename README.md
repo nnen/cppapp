@@ -7,6 +7,8 @@ my own code.
 
 Compiles to statically-linked library.
 
+[![Build Status](https://travis-ci.org/nnen/cppapp.svg?branch=master)](https://travis-ci.org/nnen/cppapp)
+
 
 Download
 --------
