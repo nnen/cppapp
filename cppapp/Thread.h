@@ -35,6 +35,8 @@ private:
 	 */
 	Thread(const Thread& other);
 	
+	Thread(pthread_t t);
+	
 	pthread_t thread_;
 	
 	static void* threadFunction(void *arg);

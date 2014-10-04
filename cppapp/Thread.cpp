@@ -49,6 +49,11 @@ Thread::Thread()
 }
 
 
+Thread::Thread(pthread_t thread) :
+	thread_(thread)
+{ }
+
+
 Thread::~Thread()
 {
 }
