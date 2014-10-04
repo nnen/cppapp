@@ -30,6 +30,11 @@ all: $(DEP_FILES)
 build: $(BIN_NAME)
 
 
+test:
+	$(MAKE) build
+	cd test && make && ./test && cd ..
+
+
 docs:
 	@echo "========= GENERATING DOCS ========="
 	doxygen
@@ -77,7 +82,7 @@ endif
 	@echo
 
 
-.PHONY: all build clean rebuild deps clean-deps docs
+.PHONY: all build test clean rebuild deps clean-deps docs
 
 
 %.d: %.cpp
