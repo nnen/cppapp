@@ -91,7 +91,7 @@ void PrettyPrinter::print(const std::string &value)
 	std::vector<std::string> lines;
 	Strings::split(value, "\n", &lines);
 	
-	for (int i = 0; i < (lines.size() - 1); i++) {
+	for (int i = 0; i < (int)(lines.size() - 1); i++) {
 		print(lines[i], true);
 	}
 	

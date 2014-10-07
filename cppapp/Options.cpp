@@ -40,7 +40,7 @@ void Option::setConfigKey(Ref<DynObject> config) const
 	Strings::split(configKey, ".", &parts);
 	
 	Ref<DynObject> target = config;
-	for (int i = 0; i < (parts.size() - 1); i++) {
+	for (int i = 0; i < (int)(parts.size() - 1); i++) {
 		target = target->getStrItem(parts[i]);
 		if (target->isError()) {
 			return;

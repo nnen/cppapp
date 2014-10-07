@@ -105,6 +105,22 @@ public:
 		HANDLE_SYSERR(pthread_mutex_lock(&mutex_));
 	}
 	
+	bool lockSeconds(int timeout)
+	{
+		struct timespec mark;
+		clock_gettime(CLOCK_REALTIME, &mark);
+		mark.tv_sec += timeout;
+
+		int err = pthread_mutex_timedlock(&mutex_, &mark);
+
+		if (err == ETIMEDOUT) {
+			return false;
+		}
+
+		HANDLE_SYSERR(err);
+		return true;
+	}
+	
 	void unlock()
 	{
 		HANDLE_SYSERR(pthread_mutex_unlock(&mutex_));
