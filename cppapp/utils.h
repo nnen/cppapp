@@ -12,7 +12,11 @@
 
 
 #include <stdint.h>
+#include <cstdlib>
+#include <cstring>
 #include <climits>
+#include <cassert>
+
 #include <map>
 #include <ostream>
 #include <iostream>
@@ -100,6 +104,56 @@ namespace cppapp {
 
 // define FIND(iter, map, expr) typeof(map.find(expr)) iter = map.find(expr); 
 #define FIND(iter, map, expr) VAR(iter, map.find(expr));
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// I/O UTILS
+////////////////////////////////////////////////////////////////////////////////
+
+
+struct MemBlock {
+	void    *ptr;
+	size_t   length;
+	
+	MemBlock() :
+		ptr(NULL), length(0)
+	{ }
+	
+	~MemBlock()
+	{
+		ptr    = NULL;
+		length = 0;
+	}
+	
+	inline void* endPtr() {
+		return (void*)(((int8_t*)ptr) + length);
+	}
+	
+	inline void release() {
+		free(ptr);
+		ptr = NULL;
+		length = 0;
+	}
+	
+	inline void alloc(size_t size) {
+		assert(size > 0);
+		release();
+		ptr = malloc(size);
+		length = size;
+	}
+	
+	inline void alloc(size_t itemSize, int itemCount) {
+		assert(itemSize > 0);
+		assert(itemCount > 0);
+		alloc(itemSize * itemCount);
+	}
+
+	inline void clear() {
+		memset(ptr, 0, length);
+	}
+};
+
 
 
 ////////////////////////////////////////////////////////////////////////////////

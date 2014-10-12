@@ -20,10 +20,14 @@ void* Thread::threadFunction(void *arg)
 	LOG_DEBUG("Thread started...");
 #endif
 	Thread *t = (Thread*)arg;
+	t->isRunning_ = true;
+	t->isStopped_ = false;
 	void *result = t->run();
 #ifdef CPPAPP_DEBUG
 	LOG_DEBUG("Returning from thread...");
 #endif
+	t->isRunning_ = false;
+	t->isStopped_ = true;
 	return result;
 }
 
@@ -40,7 +44,10 @@ void Thread::exit(void *result)
 /**
  * Constructor.
  */
-Thread::Thread()
+Thread::Thread() :
+	isRunning_(false),
+	isStopped_(false),
+	isStopRequested_(false)
 {
 #ifdef CPPAPP_DEBUG
 	LOG_DEBUG("Starting thread...");
@@ -50,12 +57,21 @@ Thread::Thread()
 
 
 Thread::Thread(pthread_t thread) :
-	thread_(thread)
+	thread_(thread),
+	isRunning_(false),
+	isStopped_(false),
+	isStopRequested_(false)
 { }
 
 
 Thread::~Thread()
 {
+}
+
+
+void Thread::requestStop()
+{
+	isStopRequested_ = true;
 }
 
 

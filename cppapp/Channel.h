@@ -11,10 +11,9 @@
 
 
 #include <vector>
-using namespace std;
 
-#include <cppapp/Mutex.h>
-using namespace cppapp;
+#include "Mutex.h"
+#include "utils.h"
 
 
 namespace cppapp {
@@ -33,13 +32,13 @@ namespace cppapp {
 template<class T>
 class Channel {
 private:
-	vector<T> buffer_;
+	std::vector<T> buffer_;
 	
-	Mutex     mutex_;
-	Condition condition_;
+	Mutex          mutex_;
+	Condition      condition_;
 	
-	int       waiting_;
-	bool      closing_;
+	int            waiting_;
+	bool           closing_;
 	
 	/**
 	 * Copy constructor.
@@ -112,6 +111,46 @@ public:
 		closing_ = true;
 		condition_.broadcast();
 	}
+};
+
+
+class ByteChannel {
+public:
+	typedef uint8_t UByte;
+	typedef void (*Callback)(MemBlock item);
+
+
+private:
+	//MemBlock            data_;
+	UByte              *data_;
+	size_t              capacity_;
+	
+	UByte              *secondaryHigh_;
+	UByte              *low_;
+	UByte              *high_;
+	
+	Mutex               mutex_;
+	Condition           condition_;
+
+	int                 waiting_;
+	bool                closing_;
+
+	int drainAllInternal(Callback callback);
+
+
+public:
+	ByteChannel(size_t capacity) :
+		capacity_(capacity), waiting_(0), closing_(false)
+	{ }
+	
+	bool isClosing() const { return closing_; }
+	
+	bool send(void *buffer, size_t size);
+	bool send(MemBlock buffer);
+	
+	int drainAll(Callback callback, bool blocking = true);
+	
+	void close();
 };
 
 

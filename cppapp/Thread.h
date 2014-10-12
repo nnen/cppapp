@@ -40,10 +40,14 @@ private:
 	pthread_t thread_;
 	
 	static void* threadFunction(void *arg);
+	
+	bool isRunning_;
+	bool isStopped_;
+	bool isStopRequested_;
 
 protected:
 	void exit(void *result);
-	
+
 public:
 	/**
 	 * Constructor.
@@ -53,10 +57,15 @@ public:
 	 * Destructor.
 	 */
 	virtual ~Thread();
+
+	virtual void requestStop();
 	
 	void* join();
 	
 	virtual void* run() = 0;
+	
+	bool isRunning() { return isRunning_; }
+	bool isStopRequested() { return isStopRequested_; }
 };
 
 
