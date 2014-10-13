@@ -157,6 +157,90 @@ struct MemBlock {
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// MATH
+////////////////////////////////////////////////////////////////////////////////
+
+
+// function KahanSum(input)
+//     var sum = 0.0
+//     var c = 0.0                  // A running compensation for lost low-order bits.
+//     for i = 1 to input.length do
+//         var y = input[i] - c     // So far, so good: c is zero.
+//         var t = sum + y          // Alas, sum is big, y small, so low-order digits of y are lost.
+//         c = (t - sum) - y // (t - sum) recovers the high-order part of y; subtracting y recovers -(low part of y)
+//         sum = t           // Algebraically, c should always be zero. Beware overly-aggressive optimizing compilers!
+//         // Next time around, the lost low part will be added to y in a fresh attempt.
+//     return sum
+
+template<class T>
+struct KahanSum {
+	T value;
+	T compensation;
+
+	inline void clear()
+	{
+		value = 0;
+		compensation = 0;
+	}
+	
+	inline T add(T other)
+	{
+		T y = other - compensation;
+		T t = value + y;
+		compensation = (t - value) - y;
+		value = t;
+		return value;
+	}
+};
+
+
+template<class T>
+struct RunningAverage {
+	KahanSum<T> sum;
+	long        count;
+
+	inline void clear()
+	{
+		sum.clear();
+		count = 0;
+	}
+	
+	inline void add(T value)
+	{
+		sum.add(value);
+		count++;
+	}
+	
+	inline T getValue()
+	{
+		return sum.value / count;
+	}
+};
+
+
+template<class T>
+struct RunningAverage2 : public RunningAverage<T> {
+	T max;
+	T min;
+	
+	inline void clear()
+	{
+		RunningAverage<T>::clear();
+		max = 0;
+		min = 0;
+	}
+
+	inline void add(T value)
+	{
+		RunningAverage<T>::add(value);
+		if (value > max) max = value;
+		if (value < min) max = value;
+	}
+};
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // BIT MANIPULATION AND ARCHITECTURE
 ////////////////////////////////////////////////////////////////////////////////
 
