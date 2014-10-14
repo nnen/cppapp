@@ -9,6 +9,7 @@
 
 #include <execinfo.h>
 #include <cstdlib>
+#include <sys/time.h>
 
 #include "Logger.h"
 #include "DynObject.h"
@@ -215,13 +216,18 @@ LogLevel Logger::logLevelFromString(std::string value)
 
 ostream& operator << (ostream& output, const LogTime& tm)
 {
-	time_t t = time(NULL);
+	struct timeval t;
+	gettimeofday(&t, NULL);
+	//time_t     t  = time(NULL);
+	struct tm *ts = localtime(&t.tv_sec);
 	char buffer[80];
-	int length = strftime(buffer, 80, "%Y-%m-%d %a %H:%M:%S", localtime(&t));
+	//int length = strftime(buffer, 80, "%Y-%m-%d %a %H:%M:%S", localtime(&t));
+	int length = strftime(buffer, 80, tm.format, ts);
 	if (length > 0)
 		output << buffer;
 	else
 		output << "#error#";
+	output << " " << t.tv_usec;
 	return output;
 }
 

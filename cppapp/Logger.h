@@ -163,6 +163,15 @@ public:
 
 
 struct LogTime {
+	const char *format;
+
+	LogTime() :
+		format("%Y-%m-%d %H:%M:%S")
+	{ }
+	
+	LogTime(const char *format) :
+		format(format)
+	{ }
 };
 
 ostream& operator << (ostream& output, const LogTime& tm);
