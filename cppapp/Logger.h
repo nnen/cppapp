@@ -50,6 +50,7 @@
 #include "utils.h"
 #include "Object.h"
 #include "Output.h"
+#include "Time.h"
 
 using namespace std;
 
@@ -74,6 +75,9 @@ enum LogLevel {
 };
 
 
+class LoggerListener;
+
+
 /**
  * \brief Simple logging class.
  */
@@ -83,6 +87,8 @@ private:
 	
 	LogLevel             level_;
 	vector<Ref<Output> > outputs_;
+	
+	vector<Ref<LoggerListener> > listeners_;
 	
 public:
 	STATIC_CTOR_HEADER(Logger)
@@ -119,6 +125,8 @@ public:
 		}
 		return *this;
 	}
+	
+	void log(const char *fileName, int lineNumber, const string &message);
 	
 	Logger& addOutput(Ref<Output> output) { outputs_.push_back(output); return *this; }
 	Logger& clearOutputs() { outputs_.clear(); return *this; }
@@ -175,6 +183,32 @@ struct LogTime {
 };
 
 ostream& operator << (ostream& output, const LogTime& tm);
+
+
+class LoggerListener : public Object {
+public:
+	virtual void handleMessage(LogLevel      level,
+				            TimeVal       time,
+				            const string &fileName,
+				            int           lineNumber,
+				            const string &message) = 0;
+};
+
+
+class OutputLoggerListener : public Object {
+private:
+	Ref<Output> output_;
+
+public:
+	virtual void handleMessage(LogLevel      level,
+				            TimeVal       time,
+				            const string &fileName,
+				            int           lineNumber,
+				            const string &message)
+	{
+		*(output_->getStream()) << time << " " << level << " " << message << endl;
+	}
+};
 
 
 } // namespace cppapp

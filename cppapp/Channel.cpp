@@ -12,7 +12,7 @@
 namespace cppapp {
 
 
-int ByteChannel::drainAllInternal(ByteChannel::Callback callback)
+int ByteChannel::drainAllInternal(ByteChannel::Callback callback, void *data)
 {
 	int count = 0;
 	
@@ -23,8 +23,8 @@ int ByteChannel::drainAllInternal(ByteChannel::Callback callback)
 			MemBlock block;
 			memcpy(&(block.length), ptr, sizeof(size_t));
 			ptr += sizeof(size_t);
-			block.ptr = (void*)ptr;
-			callback(block);
+			block.ptr = ptr;
+			callback(block, data);
 			count++;
 			ptr += block.length;
 		}
@@ -35,14 +35,13 @@ int ByteChannel::drainAllInternal(ByteChannel::Callback callback)
 	}
 	
 	return count;
-
 }
 
 
 bool ByteChannel::send(void *buffer, size_t size)
 {
 	MutexLock lock(&mutex_);
-
+	
 	int totalSize = sizeof(size_t) + size;
 	
 	if (secondaryHigh_ > data_) {
@@ -50,6 +49,7 @@ bool ByteChannel::send(void *buffer, size_t size)
 			memcpy(secondaryHigh_, &size, sizeof(size));
 			memcpy(secondaryHigh_ + sizeof(size_t), buffer, size);
 			secondaryHigh_ += totalSize;
+			condition_.signal();
 			return true;
 		}
 		return false;
@@ -59,6 +59,7 @@ bool ByteChannel::send(void *buffer, size_t size)
 		memcpy(high_, &size, sizeof(size));
 		memcpy(high_ + sizeof(size_t), buffer, size);
 		high_ += totalSize;
+		condition_.signal();
 		return true;
 	}
 	
@@ -66,6 +67,7 @@ bool ByteChannel::send(void *buffer, size_t size)
 		memcpy(secondaryHigh_, &size, sizeof(size));
 		memcpy(secondaryHigh_ + sizeof(size_t), buffer, size);
 		secondaryHigh_ += totalSize;
+		condition_.signal();
 		return true;
 	}
 	
@@ -79,7 +81,7 @@ bool ByteChannel::send(MemBlock buffer)
 }
 
 
-int ByteChannel::drainAll(ByteChannel::Callback callback, bool blocking)
+int ByteChannel::drainAll(ByteChannel::Callback callback, void *data, bool blocking)
 {
 	MutexLock lock(&mutex_);
 	
@@ -87,19 +89,26 @@ int ByteChannel::drainAll(ByteChannel::Callback callback, bool blocking)
 	
 	if (blocking) {
 		while (count < 1) {
-			if (closing_) return drainAllInternal(callback);
+			if (closing_) return drainAllInternal(callback, data);
 			
 			waiting_++;
 			condition_.wait(mutex_);
 			waiting_--;
 			
-			count = drainAllInternal(callback);
+			count = drainAllInternal(callback, data);
 		}
 		
 		return count;
 	}
 
-	return drainAllInternal(callback);
+	return drainAllInternal(callback, data);
+}
+
+
+void ByteChannel::close()
+{
+	closing_ = true;
+	condition_.broadcast();
 }
 
 

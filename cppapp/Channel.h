@@ -114,10 +114,15 @@ public:
 };
 
 
+/**
+ * \brief Thread-safe channel for raw binary data.
+ *
+ * Uses constant-size circular buffer.
+ */
 class ByteChannel {
 public:
 	typedef uint8_t UByte;
-	typedef void (*Callback)(MemBlock item);
+	typedef void (*Callback)(MemBlock item, void *data);
 
 
 private:
@@ -131,11 +136,11 @@ private:
 	
 	Mutex               mutex_;
 	Condition           condition_;
-
+	
 	int                 waiting_;
 	bool                closing_;
-
-	int drainAllInternal(Callback callback);
+	
+	int drainAllInternal(Callback callback, void *data);
 
 
 public:
@@ -148,7 +153,7 @@ public:
 	bool send(void *buffer, size_t size);
 	bool send(MemBlock buffer);
 	
-	int drainAll(Callback callback, bool blocking = true);
+	int drainAll(Callback callback, void *data, bool blocking = true);
 	
 	void close();
 };

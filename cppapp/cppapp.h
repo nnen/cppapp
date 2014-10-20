@@ -28,6 +28,7 @@
 #include "Thread.h"
 #include "Test.h"
 #include "TestApp.h"
+#include "Time.h"
 #include "string_utils.h"
 #include "json.h"
 #include "utils.h"

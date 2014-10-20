@@ -113,11 +113,15 @@ namespace cppapp {
 
 
 struct MemBlock {
-	void    *ptr;
-	size_t   length;
+	void   *ptr;
+	size_t  length;
 	
 	MemBlock() :
 		ptr(NULL), length(0)
+	{ }
+	
+	MemBlock(void *ptr, size_t length) :
+		ptr(ptr), length(length)
 	{ }
 	
 	~MemBlock()
@@ -126,30 +130,59 @@ struct MemBlock {
 		length = 0;
 	}
 	
-	inline void* endPtr() {
-		return (void*)(((int8_t*)ptr) + length);
+	template<class T>
+	inline operator T*() const
+	{
+		return (T*)ptr;
 	}
 	
-	inline void release() {
+	inline MemBlock operator+(int distance)
+	{
+		return MemBlock((void*)((uint8_t*)ptr + (distance * length)), length);
+	}
+	
+	inline MemBlock& operator+=(int distance)
+	{
+		ptr = (void*)((uint8_t*)ptr + (length * distance));
+		return *this;
+	}
+	
+	template<class T>
+	inline void set(T *ptr, size_t length)
+	{
+		this->ptr    = (void*)ptr;
+		this->length = length;
+	}
+	
+	inline void* endPtr()
+	{
+		return (void*)(((uint8_t*)ptr) + length);
+	}
+	
+	inline void release()
+	{
 		free(ptr);
 		ptr = NULL;
 		length = 0;
 	}
 	
-	inline void alloc(size_t size) {
+	inline void alloc(size_t size)
+	{
 		assert(size > 0);
 		release();
 		ptr = malloc(size);
 		length = size;
 	}
 	
-	inline void alloc(size_t itemSize, int itemCount) {
+	inline void alloc(size_t itemSize, int itemCount)
+	{
 		assert(itemSize > 0);
 		assert(itemCount > 0);
 		alloc(itemSize * itemCount);
 	}
 
-	inline void clear() {
+	inline void clear()
+	{
 		memset(ptr, 0, length);
 	}
 };

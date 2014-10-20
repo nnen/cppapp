@@ -52,6 +52,21 @@ Logger& Logger::operator << (Logger::Entry entry)
 }
 
 
+void Logger::log(const char *fileName, int lineNumber, const string &message)
+{
+	TimeVal time;
+	time.now();
+	
+	FOR_EACH(listeners_, listener) {
+		(*listener)->handleMessage(level_,
+							  time,
+							  fileName,
+							  lineNumber,
+							  message);
+	}
+}
+
+
 const char* Logger::logLevelToString(LogLevel level)
 {
 	switch (level) {

@@ -66,6 +66,8 @@ public:
 	
 	bool isRunning() { return isRunning_; }
 	bool isStopRequested() { return isStopRequested_; }
+	
+	static pthread_t getId() { return pthread_self(); }
 };
 
 
