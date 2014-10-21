@@ -1,0 +1,14 @@
+#!/bin/bash
+
+rm -fR debug
+mkdir -p debug
+pushd debug
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+popd
+
+rm -fR build
+mkdir build
+pushd build
+cmake ..
+popd
+
