@@ -13,6 +13,8 @@
 #include <string>
 #include <sstream>
 #include <libgen.h>
+#include <sys/stat.h>
+#include <errno.h>
 
 
 namespace cppapp {
@@ -32,17 +34,27 @@ public:
 	/**
 	 * \brief Constructor.
 	 */
-	Path();
+	Path() :
+		value_(".")
+	{}
 	/**
 	 * \brief Copy constructor.
 	 */
 	Path(const Path& other) : 
 		value_(other.value_)
 	{}
+	Path(const std::string &value) :
+		value_(value)
+	{}
+	Path(const char *value) :
+		value_(value)
+	{}
 	/**
 	 * \brief Destructor.
 	 */
-	virtual ~Path();
+	~Path() {}
+	
+	const std::string& toString() const { return value_; }
 	
 	/**
 	 * \brief Returns \c true if the given path is absolute, \c false otherwise.
@@ -71,6 +83,26 @@ public:
 	 */
 	static std::string join(const std::string &a, const std::string &b);
 
+};
+
+
+struct FileInfo {
+	Path        path;
+	struct stat data;
+	int         status;
+	int         error;
+	
+	FileInfo();
+	FileInfo(const Path &path);
+	FileInfo(const std::string &path);
+	FileInfo(const char *path);
+	
+	inline bool exists() const { return status == 0; }
+	
+	inline static bool exists(const std::string &path) {
+		FileInfo info(path);
+		return info.exists();
+	}
 };
 
 

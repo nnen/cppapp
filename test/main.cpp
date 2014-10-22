@@ -10,6 +10,7 @@ using namespace cppapp;
 #include "StringUtilsTest.h"
 #include "DynObjectTest.h"
 #include "InjectorTest.h"
+#include "PathTest.h"
 
 
 class BacktraceTest : public TestCase {

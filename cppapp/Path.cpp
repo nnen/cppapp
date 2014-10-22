@@ -48,15 +48,52 @@ std::string Path::join(const std::string &a, const std::string &b)
 		return b;
 	
 	bool addSeparator = false;
-	if (a.size() > 1 && (a[a.size() - 1] != SEPARATOR))
+	if ((a.size() > 0) && ((a[a.size() - 1] != SEPARATOR)))
 		addSeparator = true;
 	
 	std::ostringstream ss;
 	ss << a;
-	ss.put(SEPARATOR);
+	if (addSeparator)
+		ss.put(SEPARATOR);
 	ss << b;
 	
 	return ss.str();
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// STRUCT FileInfo
+////////////////////////////////////////////////////////////////////////////////
+
+
+FileInfo::FileInfo() :
+	path(), status(-1), error(0)
+{
+	
+}
+
+
+FileInfo::FileInfo(const Path &path) :
+	path(path)
+{
+	status = stat(path.toString().c_str(), &data);
+	error = errno;
+}
+
+
+FileInfo::FileInfo(const std::string &path) :
+	path(path)
+{
+	status = stat(path.c_str(), &data);
+	error = errno;
+}
+
+
+FileInfo::FileInfo(const char *path) :
+	path(path)
+{
+	status = stat(path, &data);
+	error = errno;
 }
 
 

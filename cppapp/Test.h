@@ -369,6 +369,9 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 
+/**
+ * \brief Base class for unit testing.
+ */
 class TestRunner {
 private:
 	int testCount_;
@@ -377,6 +380,8 @@ private:
 	int expectedFailureCount_;
 	
 protected:
+	virtual TestResult runTest(Ref<TestRef> test);
+	
 	virtual void startTests(const TestSuite &tests) {}
 	virtual void finishTests(const TestSuite &tests) {}
 	virtual void startTest(Ref<TestRef> test) {}

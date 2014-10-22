@@ -186,6 +186,12 @@ void TestCase::reset()
 ////////////////////////////////////////////////////////////////////////////////
 
 
+TestResult TestRunner::runTest(Ref<TestRef> test)
+{
+	return test->run();
+}
+
+
 void TestRunner::run(const TestSuite &tests)
 {
 	testCount_ = 0;
@@ -198,7 +204,8 @@ void TestRunner::run(const TestSuite &tests)
 	FOR_EACH(tests, test) {
 		startTest(*test);
 		
-		TestResult result = (*test)->run();
+		//TestResult result = (*test)->run();
+		TestResult result = runTest(*test);
 		if (!result.success) {
 			if (result.expectedFailure)
 				expectedFailureCount_++;
