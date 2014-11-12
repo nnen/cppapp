@@ -152,8 +152,9 @@ public:
 		TEST_ADD(JSONParserTest, testParseNumber);
 		TEST_ADD(JSONParserTest, testParseBool);
 		TEST_ADD(JSONParserTest, testParseDict);
-		TEST_ADD(JSONParserTest, testParseDict);
+		//TEST_ADD(JSONParserTest, testParseDict);
 		TEST_ADD(JSONParserTest, testParseComment);
+		TEST_ADD(JSONParserTest, testParseHashComment);
 	}
 	
 	void testParseComplex()
@@ -171,6 +172,20 @@ public:
 			"}\n"
 		);
 		TEST_ASSERT(result->isDict(), "the result is not a DynDict");
+
+		result = parser.parse(
+			"{\n"
+			"	first = 1;\n"
+			"	second {};\n"
+			"	third {\n"
+			"		first: [];"
+			"		second = [1; 2];"
+			"		third: [1, 2, 3, ];"
+			"	},\n"
+			"}\n"
+		);
+		TEST_ASSERT(result->isDict(), "the result is not a DynDict");
+
 	}
 	
 	void testParseEmptyDict00()
@@ -271,8 +286,15 @@ public:
 		TEST_ASSERT(result->hasStrItem("value"), "the parsed json dict doesn't have the expected keys");
 		TEST_ASSERT(result->getStrItem("value")->getInt() == 12, "a json dict item doesn't have the expected value");
 		TEST_ASSERT(result->hasStrItem("some_list"), "the parsed json dict doesn't have the expected keys");
+		
+		result = parser.parse("{\"value\" = 12, \"some_list\" = [1, 2, 3]}");
+		TEST_ASSERT(result->isDict(), "dictionary with equal signs is not parsed as expected");
+		TEST_EQUALS(2, result->getSize(), "size of json dict with equals signs is not what is expected");
+		
+		result = parser.parse("{value { a = 1, b = 2 }}");
+		TEST_ASSERT(result->isDict(), "dictionary without colons or equal signs is not parsed as expected");
 	}
-
+	
 	void testParseComment()
 	{
 		JSONParser parser;
@@ -293,6 +315,14 @@ public:
 		}
 		TEST_ASSERT(result->isDict(), "the result should be a dict");
 		TEST_EQUALS(2, result->getSize(), "there should be two items in the dict");
+	}
+	
+	void testParseHashComment()
+	{
+		JSONParser parser;
+		Ref<DynObject> result = parser.parse("# some comment\n# 13\n10");
+		TEST_ASSERT(result->isNum(), "the result is not a JSONNumber as expected");
+		TEST_ASSERT(10 == result->getInt(), "the result should be equal to 10");
 	}
 
 };

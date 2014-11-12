@@ -59,6 +59,8 @@ private:
 	bool readNumber(Ref<DynObject> *result);
 	bool readBool(Ref<DynObject> *result);
 	bool readNull(Ref<DynObject> *result);
+	
+	bool readSeparator();
 
 public:
 	/**

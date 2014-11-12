@@ -43,7 +43,7 @@ void JSONParser::skipWhitespace()
 	while (true) {
 		lexer.skipWhitespace();
 		
-		if (!lexer.read("//"))
+		if (!(lexer.read("//") || lexer.read("#")))
 			break;
 		
 		while (lexer.peek() != '\n' && lexer.peek() >= 0)
@@ -104,13 +104,8 @@ bool JSONParser::readDict(Ref<DynObject> *result)
 		
 		dict->setItem(key, value);
 		
-		skipWhitespace();
-		if (!lexer.read(','))
+		if (!readSeparator())
 			break;
-		skipWhitespace();
-		while (lexer.read(',')) {
-			skipWhitespace();
-		}
 	}
 	
 	if (!lexer.read('}')) {
@@ -136,7 +131,11 @@ bool JSONParser::readKeyValue(Ref<DynString> *key, Ref<DynObject> *value)
 	
 	*key = k;
 	
-	if (!lexer.read(':')) {
+	if (readDict(value)) {
+		return true;
+	}
+	
+	if (!(lexer.read(':') || lexer.read('='))) {
 		*value = ERROR;
 		return true;
 	}
@@ -159,7 +158,8 @@ bool JSONParser::readList(Ref<DynObject> *result)
 	Ref<DynList> list = new DynList(lexer.getLocation());
 	*result = list;
 	
-	while (lexer.read(','));
+	//while (lexer.read(','));
+	readSeparator();
 	if (lexer.read(']'))
 		return true;
 	
@@ -174,9 +174,8 @@ bool JSONParser::readList(Ref<DynObject> *result)
 
 		list->append(item);
 		
-		if (!lexer.read(','))
+		if (!readSeparator())
 			break;
-		while (lexer.read(','));
 	}
 	
 	if (!lexer.read(']')) {
@@ -200,7 +199,13 @@ bool JSONParser::readString(Ref<DynObject> *result)
 	while (true) {
 		if (escape) {
 			escape = false;
-			oss.put(lexer.read());
+			int c = lexer.read();
+			switch (c) {
+			case 'n': oss.put('\n'); break;
+			case 'r': oss.put('\r'); break;
+			case 't': oss.put('\t'); break;
+			default:  oss.put(c);    break;
+			}
 			continue;
 		}
 		
@@ -285,6 +290,21 @@ bool JSONParser::readNull(Ref<DynObject> *result)
 		return false;
 	
 	*result = DynNull::getInstance();
+	return true;
+}
+
+
+bool JSONParser::readSeparator()
+{
+	skipWhitespace();
+
+	if (!(lexer.read(',') || lexer.read(';')))
+		return false;
+	
+	skipWhitespace();
+	while (lexer.read(',') || lexer.read(';'))
+		skipWhitespace();
+
 	return true;
 }
 

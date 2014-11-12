@@ -116,6 +116,17 @@ void Lexer::skipWhitespace()
 }
 
 
+bool Lexer::skipWhitespace(int expected)
+{
+	while (isspace(peek())) {
+		int c = read();
+		if (c == expected) return true;
+	}
+	
+	return false;
+}
+
+
 } // namespace cppapp
 
 

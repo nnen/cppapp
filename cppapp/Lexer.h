@@ -59,6 +59,7 @@ public:
 	bool read(const char *expected, bool skipSpace = true);
 	
 	void skipWhitespace();
+	bool skipWhitespace(int expected);
 };
 
 
