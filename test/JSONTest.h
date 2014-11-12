@@ -235,7 +235,6 @@ public:
 		TEST_ASSERT(result->isError(),
 				  "the result is not a JSONError as expected");
 	}
-
 	
 	void testParseNumber(const char *json, double value)
 	{

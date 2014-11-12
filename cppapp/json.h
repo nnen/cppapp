@@ -36,7 +36,14 @@ namespace cppapp {
  * The sytax extensions include:
  * \li any number of commas allowed after each array item and key-value
  *     pair in an object including the last one (<tt>[1, 2, ]</tt>),
- * \li C++-style line comments (<tt>// a comment</tt>),
+ * \li semicolons are allowed instead of commas in both
+ *     lists and objects (<tt>{"a": 1; "b": 2}</tt>),
+ * \li keywords allowed instead of strings as keys in objects
+ *     (<tt>{a: 1, b: 2}</tt>),
+ * \li equal signs are allowed instead of colons in objects
+ *     (<tt>{a = 1, b = 2}</tt>),
+ * \li bash-style and C++-style line comments
+ *     (<tt># a comment</tt> or <tt>// a comment</tt>),
  * \li capital letters allowed in literals (<tt>True</tt>).
  */
 class JSONParser {
