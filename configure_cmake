@@ -1,14 +1,17 @@
 #!/bin/bash
 
+#CMAKE=/home/jan/Projects/cppapp/cmake-3.0.2-Linux-i386/bin/cmake
+CMAKE=cmake
+
 rm -fR debug
 mkdir -p debug
 pushd debug
-cmake -DCMAKE_BUILD_TYPE=Debug ..
+${CMAKE} -DCMAKE_BUILD_TYPE=Debug ..
 popd
 
 rm -fR build
 mkdir build
 pushd build
-cmake ..
+${CMAKE} ..
 popd
 
